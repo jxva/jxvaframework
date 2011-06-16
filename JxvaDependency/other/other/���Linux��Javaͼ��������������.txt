@@ -1,0 +1,17 @@
+
+解决Linux下Java图形中文乱码问题
+
+
+在jdk15以后，只需在~/jre/lib/fonts/下建一个fallback目录，把你想在java中使用的字体烤贝到这个目录中即可
+
+以下方法在fc6下测试通过,假设用户的jre路径为 /usr/java/jdk1.6.0_03/jre/
+
+cd /usr/java/jdk1.6.0_03/jre/lib/fonts
+
+sudo mkdir fallback
+
+将C:\WINDOWS\Fonts\simsun.ttc与C:\WINDOWS\Fonts\simhei.ttf
+
+拷贝到 /usr/java/jdk1.6.0_03/jre/lib/fonts/fallback文件夹内
+
+ok! 

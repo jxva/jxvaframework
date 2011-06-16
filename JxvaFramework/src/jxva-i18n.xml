@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+	<!--locale:default,zh_CN,zh_TW,en_US,ko_KR,ja_JP,fr_FR,de_DE,it_IT,en_GB,en_CA,fr_CA-->
+	
+	<resources locale="default">
+		<resource name="i18n">jxva-i18n</resource>
+		<resource name="i18n2">jxva-i18n-2</resource>
+	</resources>
+</jxva>

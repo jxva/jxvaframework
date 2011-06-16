@@ -1,0 +1,52 @@
+参数绑定：
+Hibernate中对动态查询参数绑定提供了丰富的支持，那么什么是查询参数动态绑定呢？其实如果我们熟悉传统JDBC编程的话，我们就不难理解查询参数动态绑定，如下代码传统JDBC的参数绑定：
+PrepareStatement pre=connection.prepare(“select * from User where user.name=?”);
+pre.setString(1,”zhaoxin”);
+ResultSet rs=pre.executeQuery();
+在Hibernate中也提供了类似这种的查询参数绑定功能，而且在Hibernate中对这个功能还提供了比传统JDBC操作丰富的多的特性，在Hibernate中共存在4种参数绑定的方式，下面我们将分别介绍：
+A、 按参数名称绑定：
+在HQL语句中定义命名参数要用”:”开头，形式如下：
+Query query=session.createQuery(“from User user where user.name=:customername and user:customerage=:age ”);
+query.setString(“customername”,name);
+query.setInteger(“customerage”,age);
+上面代码中用:customername和:customerage分别定义了命名参数customername和customerage，然后用 Query接口的setXXX()方法设定名参数值，setXXX()方法包含两个参数，分别是命名参数名称和命名参数实际值。
+B、 按参数位置邦定：
+在HQL查询语句中用”?”来定义参数位置，形式如下：
+Query query=session.createQuery(“from User user where user.name=? and user.age =? ”);
+query.setString(0,name);
+query.setInteger(1,age);
+同样使用setXXX()方法设定绑定参数，只不过这时setXXX()方法的第一个参数代表邦定参数在HQL语句中出现的位置编号（由0开始编号），第二个参数仍然代表参数实际值。
+注：在实际开发中，提倡使用按名称邦定命名参数，因为这不但可以提供非常好的程序可读性，而且也提高了程序的易维护性，因为当查询参数的位置发生改变时，按名称邦定名参数的方式中是不需要调整程序代码的。
+C、 setParameter()方法：
+在Hibernate的HQL查询中可以通过setParameter()方法邦定任意类型的参数，如下代码：
+String hql=”from User user where user.name=:customername ”;
+Query query=session.createQuery(hql);
+query.setParameter(“customername”,name,Hibernate.STRING);
+如上面代码所示，setParameter()方法包含三个参数，分别是命名参数名称，命名参数实际值，以及命名参数映射类型。对于某些参数类型 setParameter()方法可以更具参数值的Java类型，猜测出对应的映射类型，因此这时不需要显示写出映射类型，像上面的例子，可以直接这样写：
+query.setParameter(“customername”,name);但是对于一些类型就必须写明映射类型，比如 java.util.Date类型，因为它会对应Hibernate的多种映射类型，比如Hibernate.DATA或者 Hibernate.TIMESTAMP。
+D、 setProperties()方法：
+在Hibernate中可以使用setProperties()方法，将命名参数与一个对象的属性值绑定在一起，如下程序代码：
+Customer customer=new Customer();
+customer.setName(“pansl”);
+customer.setAge(80);
+Query query=session.createQuery(“from Customer c where c.name=:name and c.age=:age ”);
+query.setProperties(customer);
+setProperties()方法会自动将customer对象实例的属性值匹配到命名参数上，但是要求命名参数名称必须要与实体对象相应的属性同名。
+这里还有一个特殊的setEntity()方法，它会把命名参数与一个持久化对象相关联，如下面代码所示：
+Customer customer=(Customer)session.load(Customer.class,”1”);
+Query query=session.createQuery(“from Order order where order.customer=:customer ”);
+query. setProperties(“customer”,customer);
+List list=query.list();
+上面的代码会生成类似如下的SQL语句：
+Select * from order where customer_ID=’1’;
+E、 使用绑定参数的优势：
+我们为什么要使用绑定命名参数？任何一个事物的存在都是有其价值的，具体到绑定参数对于HQL查询来说，主要有以下两个主要优势：
+①、 可以利用数据库实施性能优化，因为对Hibernate来说在底层使用的是PrepareStatement来完成查询，因此对于语法相同参数不同的SQL语句，可以充分利用预编译SQL语句缓存，从而提升查询效率。
+②、 可以防止SQL Injection安全漏洞的产生：
+SQL Injection是一种专门针对SQL语句拼装的攻击方式，比如对于我们常见的用户登录，在登录界面上，用户输入用户名和口令，这时登录验证程序可能会生成如下的HQL语句：
+“from User user where user.name=’”+name+”’ and user.password=’”+password+”’ ”
+这个HQL语句从逻辑上来说是没有任何问题的，这个登录验证功能在一般情况下也是会正确完成的，但是如果在登录时在用户名中输入”zhaoxin or ‘x’=’x”,这时如果使用简单的HQL语句的字符串拼装，就会生成如下的HQL语句：
+“from User user where user.name=’zhaoxin’ or ‘x’=’x’ and user.password=’admin’ ”;
+显然这条HQL语句的where字句将会永远为真，而使用户口令的作用失去意义，这就是SQL Injection攻击的基本原理。
+而使用绑定参数方式，就可以妥善处理这问题,当使用绑定参数时，会得到下面的HQL语句：
+from User user where user.name=’’zhaoxin’’ or ‘’x=’’x’’ ‘ and user.password=’admin’;由此可见使用绑定参数会将用户名中输入的单引号解析成字符串（如果想在字符串中包含单引号，应使用重复单引号形式），所以参数绑定能够有效防止SQL Injection安全漏洞。

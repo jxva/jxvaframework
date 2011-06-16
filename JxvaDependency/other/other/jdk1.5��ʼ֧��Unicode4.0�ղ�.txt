@@ -1,0 +1,15 @@
+      在1.5之前的java版本已经支持Unicode 3.0，且所有的Unicode字符均容于16位（也就是一个char）。从jdk1.5开始，Java改支持Unicode 4.0，它定义了数个不能容于16位的字符。这代表它们不能容于一个char，就需要使用int来表示这些字符，因此像
+Character.isUpperCase()和Character.isWhiteSpace()这两个方法现在具有接受int作为参数的变量。所以说，如果你需要在Unicode3.0中没有的Unicode4.0的值，你会需要使用到这些新的方法。
+文档中的关于Unicode 4.0的说明：
+Unicode 字符表示形式
+char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。Unicode 标准曾做过修改，以允许那些其表示形式需要超过 16 位的字符。合法代码点 的范围现在是从 U+0000 到 U+10FFFF，即通常所说的 Unicode 标量值。（请参阅 Unicode 标准中 U+n 表示法的定义。）
+
+从 U+0000 到 U+FFFF 的字符集有时也称为 Basic Multilingual Plane (BMP)。代码点大于 U+FFFF 的字符称为增补字符。Java 2 平台在 char 数组以及 String 和 StringBuffer 类中使用 UTF-16 表示形式。在这种表现形式中，增补字符表示为一对 char 值，第一个值取自高代理项 范围，即 (\uD800-\uDBFF)，第二个值取自低代理项 范围，即 (\uDC00-\uDFFF)。
+
+所以，char 值表示 Basic Multilingual Plane (BMP) 代码点，其中包括代理项代码点，或 UTF-16 编码的代码单元。int 值表示所有 Unicode 代码点，包括增补代码点。int 的 21 个低位（最低有效位）用于表示 Unicode 代码点，并且 11 个高位（最高有效位）必须为零。除非另有指定，否则与增补字符和代理项 char 值有关的行为如下：
+
+只接受一个 char 值的方法无法支持增补字符。它们将代理项字符范围内的 char 值视为未定义字符。例如，Character.isLetter('\uD840') 返回 false，即使是特定值，如果在字符串的后面跟着任何低代理项值，那么它将表示一个字母。
+接受一个 int 值的方法支持所有 Unicode 字符，其中包括增补字符。例如，Character.isLetter(0x2F81A) 返回 true，因为代码点值表示一个字母（一个 CJK 象形文字）。
+在 Java SE API 文档中，Unicode 代码点 用于范围在 U+0000 与 U+10FFFF 之间的字符值，而 Unicode 代码点 用于作为 UTF-16 编码的代码单元的 16 位 char 值。
+
+注:参考Java5.0 Tiger :A Developer's NoteBook

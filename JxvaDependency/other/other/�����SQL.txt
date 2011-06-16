@@ -1,0 +1,516 @@
+# 说明：复制表(只复制结构,源表名：a 新表名：b)
+select * into b from a where 1<>1
+# 说明：拷贝表(拷贝数据,源表名：a 目标表名：b)
+insert into b(a, b, c) select d,e,f from b;
+# 说明：显示文章、提交人和最后回复时间
+select a.title,a.username,b.adddate from table a,(select max(adddate) adddate from table where table.title=a.title) b
+# 说明：外连接查询(表名1：a 表名2：b)
+select a.a, a.b, a.c, b.c, b.d, b.f from a LEFT OUT JOIN b ON a.a = b.c
+# 说明：日程安排提前五分钟提醒
+select * from 日程安排 where datediff('minute',f开始时间,getdate())>5
+# 说明：两张关联表，删除主表中已经在副表中没有的信息
+delete from info where not exists ( select * from infobz where info.infid=infobz.infid )
+# 说明：--
+
+SQL:
+
+SELECT A.NUM, A.NAME, B.UPD_DATE, B.PREV_UPD_DATE
+
+FROM TABLE1,
+
+(SELECT X.NUM, X.UPD_DATE, Y.UPD_DATE PREV_UPD_DATE
+
+FROM (SELECT NUM, UPD_DATE, INBOUND_QTY, STOCK_ONHAND
+
+FROM TABLE2
+
+WHERE TO_CHAR(UPD_DATE,'YYYY/MM') = TO_CHAR(SYSDATE, 'YYYY/MM')) X,
+
+(SELECT NUM, UPD_DATE, STOCK_ONHAND
+
+FROM TABLE2
+
+WHERE TO_CHAR(UPD_DATE,'YYYY/MM') =
+
+TO_CHAR(TO_DATE(TO_CHAR(SYSDATE, 'YYYY/MM') || '/01','YYYY/MM/DD') - 1, 'YYYY/MM') ) Y,
+
+WHERE X.NUM = Y.NUM （+）
+
+AND X.INBOUND_QTY + NVL(Y.STOCK_ONHAND,0) <> X.STOCK_ONHAND ) B
+
+WHERE A.NUM = B.NUM
+# 说明：--
+select * from studentinfo where not exists(select * from student where studentinfo.id=student.id) and 系名称='"&strdepartmentname&"' and 专业名称='"&strprofessionname&"' order by 性别,生源地,高考总成绩
+# 从数据库中去一年的各单位电话费统计(电话费定额贺电化肥清单两个表来源）
+
+SELECT a.userper, a.tel, a.standfee, TO_CHAR(a.telfeedate, 'yyyy') AS telyear,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '01', a.factration)) AS JAN,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '02', a.factration)) AS FRI,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '03', a.factration)) AS MAR,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '04', a.factration)) AS APR,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '05', a.factration)) AS MAY,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '06', a.factration)) AS JUE,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '07', a.factration)) AS JUL,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '08', a.factration)) AS AGU,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '09', a.factration)) AS SEP,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '10', a.factration)) AS OCT,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '11', a.factration)) AS NOV,
+
+SUM(decode(TO_CHAR(a.telfeedate, 'mm'), '12', a.factration)) AS DEC
+
+FROM (SELECT a.userper, a.tel, a.standfee, b.telfeedate, b.factration
+
+FROM TELFEESTAND a, TELFEE b
+
+WHERE a.tel = b.telfax) a
+
+GROUP BY a.userper, a.tel, a.standfee, TO_CHAR(a.telfeedate, 'yyyy')
+# 说明：四表联查问题
+select * from a left inner join b on a.a=b.b right inner join c on a.a=c.c inner join d on a.a=d.d where .....
+# 说明：得到表中最小的未使用的ID号
+# SELECT (CASE WHEN EXISTS(SELECT * FROM Handle b WHERE b.HandleID = 1) THEN MIN(HandleID) + 1 ELSE 1 END) as HandleID FROM Handle WHERE NOT HandleID IN (SELECT a.HandleID - 1 FROM Handle a)
+# 一个SQL语句的问题:行列转换
+select * from v_temp
+上面的视图结果如下:
+user_name role_name
+-------------------------
+系统管理员 管理员
+feng 管理员
+feng 一般用户
+test 一般用户
+想把结果变成这样:
+user_name role_name
+---------------------------
+系统管理员 管理员
+feng 管理员,一般用户
+test 一般用户
+===================
+create table a_test(name varchar(20),role2 varchar(20))
+insert into a_test values('李','管理员')
+insert into a_test values('张','管理员')
+insert into a_test values('张','一般用户')
+insert into a_test values('常','一般用户')
+
+create function join_str(@content varchar(100))
+returns varchar(2000)
+as
+begin
+declare @str varchar(2000)
+set @str=''
+select @str=@str+','+rtrim(role2) from a_test where [name]=@content
+select @str=right(@str,len(@str)-1)
+return @str
+end
+go
+
+--调用：
+select [name],dbo.join_str([name]) role2 from a_test group by [name]
+
+--select distinct name,dbo.uf_test(name) from a_test
+# 快速比较结构相同的两表
+结构相同的两表，一表有记录3万条左右，一表有记录2万条左右，我怎样快速查找两表的不同记录？
+============================
+给你一个测试方法，从northwind中的orders表取数据。
+select * into n1 from orders
+select * into n2 from orders
+
+select * from n1
+select * from n2
+
+--添加主键，然后修改n1中若干字段的若干条
+alter table n1 add constraint pk_n1_id primary key (OrderID)
+alter table n2 add constraint pk_n2_id primary key (OrderID)
+
+select OrderID from (select * from n1 union select * from n2) a group by OrderID having count(*) > 1
+
+应该可以，而且将不同的记录的ID显示出来。
+下面的适用于双方记录一样的情况，
+
+select * from n1 where orderid in (select OrderID from (select * from n1 union select * from n2) a group by OrderID having count(*) > 1)
+至于双方互不存在的记录是比较好处理的
+--删除n1,n2中若干条记录
+delete from n1 where orderID in ('10728','10730')
+delete from n2 where orderID in ('11000','11001')
+
+--*************************************************************
+-- 双方都有该记录却不完全相同
+select * from n1 where orderid in(select OrderID from (select * from n1 union select * from n2) a group by OrderID having count(*) > 1)
+union
+--n2中存在但在n1中不存的在10728,10730
+select * from n1 where OrderID not in (select OrderID from n2)
+union
+--n1中存在但在n2中不存的在11000,11001
+select * from n2 where OrderID not in (select OrderID from n1)
+# 四种方法取表里n到m条纪录：
+
+1.
+select top m * into 临时表(或表变量) from tablename order by columnname -- 将top m笔插入
+set rowcount n
+select * from 表变量 order by columnname desc
+
+
+2.
+select top n * from (select top m * from tablename order by columnname) a order by columnname desc
+
+
+3.如果tablename里没有其他identity列，那么：
+select identity(int) id0,* into #temp from tablename
+
+取n到m条的语句为：
+select * from #temp where id0 >=n and id0 <= m
+
+如果你在执行select identity(int) id0,* into #temp from tablename这条语句的时候报错,那是因为你的DB中间的select into/bulkcopy属性没有打开要先执行：
+exec sp_dboption 你的DB名字,'select into/bulkcopy',true
+
+
+4.如果表里有identity属性，那么简单：
+select * from tablename where identitycol between n and m
+# 如何删除一个表中重复的记录？
+create table a_dist(id int,name varchar(20))
+
+insert into a_dist values(1,'abc')
+insert into a_dist values(1,'abc')
+insert into a_dist values(1,'abc')
+insert into a_dist values(1,'abc')
+
+exec up_distinct 'a_dist','id'
+
+select * from a_dist
+
+create procedure up_distinct(@t_name varchar(30),@f_key varchar(30))
+--f_key表示是分组字段﹐即主键字段
+as
+begin
+declare @max integer,@id varchar(30) ,@sql varchar(7999) ,@type integer
+select @sql = 'declare cur_rows cursor for select '+@f_key+' ,count(*) from ' +@t_name +' group by ' +@f_key +' having count(*) > 1'
+exec(@sql)
+open cur_rows
+fetch cur_rows into @id,@max
+while @@fetch_status=0
+begin
+select @max = @max -1
+set rowcount @max
+select @type = xtype from syscolumns where id=object_id(@t_name) and name=@f_key
+if @type=56
+select @sql = 'delete from '+@t_name+' where ' + @f_key+' = '+ @id
+if @type=167
+select @sql = 'delete from '+@t_name+' where ' + @f_key+' = '+''''+ @id +''''
+exec(@sql)
+fetch cur_rows into @id,@max
+end
+close cur_rows
+deallocate cur_rows
+set rowcount 0
+end
+
+select * from systypes
+select * from syscolumns where id = object_id('a_dist')
+# 查询数据的最大排序问题（只能用一条语句写）
+CREATE TABLE hard (qu char (11) ,co char (11) ,je numeric(3, 0))
+
+insert into hard values ('A','1',3)
+insert into hard values ('A','2',4)
+insert into hard values ('A','4',2)
+insert into hard values ('A','6',9)
+insert into hard values ('B','1',4)
+insert into hard values ('B','2',5)
+insert into hard values ('B','3',6)
+insert into hard values ('C','3',4)
+insert into hard values ('C','6',7)
+insert into hard values ('C','2',3)
+
+
+要求查询出来的结果如下：
+
+qu co je
+----------- ----------- -----
+A 6 9
+A 2 4
+B 3 6
+B 2 5
+C 6 7
+C 3 4
+
+
+就是要按qu分组，每组中取je最大的前2位！！
+而且只能用一句sql语句！！！
+select * from hard a where je in (select top 2 je from hard b where a.qu=b.qu order by je)
+# 求删除重复记录的sql语句？
+怎样把具有相同字段的纪录删除，只留下一条。
+例如，表test里有id,name字段
+如果有name相同的记录 只留下一条，其余的删除。
+name的内容不定，相同的记录数不定。
+有没有这样的sql语句？
+==============================
+A:一个完整的解决方案：
+
+将重复的记录记入temp1表:
+select [标志字段id],count(*) into temp1 from [表名]
+group by [标志字段id]
+having count(*)>1
+
+2、将不重复的记录记入temp1表:
+insert temp1 select [标志字段id],count(*) from [表名] group by [标志字段id] having count(*)=1
+
+3、作一个包含所有不重复记录的表：
+select * into temp2 from [表名] where 标志字段id in(select 标志字段id from temp1)
+
+4、删除重复表:
+delete [表名]
+
+5、恢复表：
+insert [表名] select * from temp2
+
+6、删除临时表:
+drop table temp1
+drop table temp2
+================================
+B:
+create table a_dist(id int,name varchar(20))
+
+insert into a_dist values(1,'abc')
+insert into a_dist values(1,'abc')
+insert into a_dist values(1,'abc')
+insert into a_dist values(1,'abc')
+
+exec up_distinct 'a_dist','id'
+
+select * from a_dist
+
+create procedure up_distinct(@t_name varchar(30),@f_key varchar(30))
+--f_key表示是分组字段﹐即主键字段
+as
+begin
+declare @max integer,@id varchar(30) ,@sql varchar(7999) ,@type integer
+select @sql = 'declare cur_rows cursor for select '+@f_key+' ,count(*) from ' +@t_name +' group by ' +@f_key +' having count(*) > 1'
+exec(@sql)
+open cur_rows
+fetch cur_rows into @id,@max
+while @@fetch_status=0
+begin
+select @max = @max -1
+set rowcount @max
+select @type = xtype from syscolumns where id=object_id(@t_name) and name=@f_key
+if @type=56
+select @sql = 'delete from '+@t_name+' where ' + @f_key+' = '+ @id
+if @type=167
+select @sql = 'delete from '+@t_name+' where ' + @f_key+' = '+''''+ @id +''''
+exec(@sql)
+fetch cur_rows into @id,@max
+end
+close cur_rows
+deallocate cur_rows
+set rowcount 0
+end
+
+select * from systypes
+select * from syscolumns where id = object_id('a_dist')
+# 行列转换--普通
+
+假设有张学生成绩表(CJ)如下
+Name Subject Result
+张三 语文 80
+张三 数学 90
+张三 物理 85
+李四 语文 85
+李四 数学 92
+李四 物理 82
+
+想变成
+姓名 语文 数学 物理
+张三 80 90 85
+李四 85 92 82
+
+declare @sql varchar(4000)
+set @sql = 'select Name'
+select @sql = @sql + ',sum(case Subject when '''+Subject+''' then Result end) ['+Subject+']'
+from (select distinct Subject from CJ) as a
+select @sql = @sql+' from test group by name'
+exec(@sql)
+
+行列转换--合并
+
+有表A,
+id pid
+1 1
+1 2
+1 3
+2 1
+2 2
+3 1
+如何化成表B:
+id pid
+1 1,2,3
+2 1,2
+3 1
+
+创建一个合并的函数
+create function fmerg(@id int)
+returns varchar(8000)
+as
+begin
+declare @str varchar(8000)
+set @str=''
+select @str=@str+','+cast(pid as varchar) from 表A where id=@id
+set @str=right(@str,len(@str)-1)
+return(@str)
+End
+go
+
+--调用自定义函数得到结果
+select distinct id,dbo.fmerg(id) from 表A
+# 如何取得一个数据表的所有列名
+
+方法如下：先从SYSTEMOBJECT系统表中取得数据表的SYSTEMID,然后再SYSCOLUMN表中取得该数据表的所有列名。
+SQL语句如下：
+declare @objid int,@objname char(40)
+set @objname = 'tablename'
+select @objid = id from sysobjects where id = object_id(@objname)
+select 'Column_name' = name from syscolumns where id = @objid order by colid
+
+或
+
+SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='users'
+# 通过SQL语句来更改用户的密码
+
+修改别人的,需要sysadmin role
+EXEC sp_password NULL, 'newpassword', 'User'
+
+如果帐号为SA执行EXEC sp_password NULL, 'newpassword', sa
+# 怎么判断出一个表的哪些字段不允许为空？
+
+select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where IS_NULLABLE='NO' and TABLE_NAME=tablename
+# 如何在数据库里找到含有相同字段的表？
+a. 查已知列名的情况
+SELECT b.name as TableName,a.name as columnname
+From syscolumns a INNER JOIN sysobjects b
+ON a.id=b.id
+AND b.type='U'
+AND a.name='你的字段名字'
+# 未知列名查所有在不同表出现过的列名
+Select o.name As tablename,s1.name As columnname
+From syscolumns s1, sysobjects o
+Where s1.id = o.id
+And o.type = 'U'
+And Exists (
+Select 1 From syscolumns s2
+Where s1.name = s2.name
+And s1.id <> s2.id
+)
+# 查询第xxx行数据
+
+假设id是主键：
+select * from (select top xxx * from yourtable) aa where not exists(select 1 from (select top xxx-1 * from yourtable) bb where aa.id=bb.id)
+
+如果使用游标也是可以的
+fetch absolute [number] from [cursor_name]
+行数为绝对行数
+# SQL Server日期计算
+a. 一个月的第一天
+SELECT DATEADD(mm, DATEDIFF(mm,0,getdate()), 0)
+b. 本周的星期一
+SELECT DATEADD(wk, DATEDIFF(wk,0,getdate()), 0)
+c. 一年的第一天
+SELECT DATEADD(yy, DATEDIFF(yy,0,getdate()), 0)
+d. 季度的第一天
+SELECT DATEADD(qq, DATEDIFF(qq,0,getdate()), 0)
+e. 上个月的最后一天
+SELECT dateadd(ms,-3,DATEADD(mm, DATEDIFF(mm,0,getdate()), 0))
+f. 去年的最后一天
+SELECT dateadd(ms,-3,DATEADD(yy, DATEDIFF(yy,0,getdate()), 0))
+g. 本月的最后一天
+SELECT dateadd(ms,-3,DATEADD(mm, DATEDIFF(m,0,getdate())+1, 0))
+h. 本月的第一个星期一
+select DATEADD(wk, DATEDIFF(wk,0,
+dateadd(dd,6-datepart(day,getdate()),getdate())
+), 0)
+i. 本年的最后一天
+SELECT dateadd(ms,-3,DATEADD(yy, DATEDIFF(yy,0,getdate())+1, 0))。
+# 获取表结构[把 'sysobjects' 替换 成 'tablename' 即可]
+
+SELECT CASE IsNull(I.name, '')
+When '' Then ''
+Else '*'
+End as IsPK,
+Object_Name(A.id) as t_name,
+A.name as c_name,
+IsNull(SubString(M.text, 1, 254), '') as pbc_init,
+T.name as F_DataType,
+CASE IsNull(TYPEPROPERTY(T.name, 'Scale'), '')
+WHEN '' Then Cast(A.prec as varchar)
+ELSE Cast(A.prec as varchar) + ',' + Cast(A.scale as varchar)
+END as F_Scale,
+A.isnullable as F_isNullAble
+FROM Syscolumns as A
+JOIN Systypes as T
+ON (A.xType = T.xUserType AND A.Id = Object_id('sysobjects') )
+LEFT JOIN ( SysIndexes as I
+JOIN Syscolumns as A1
+ON ( I.id = A1.id and A1.id = object_id('sysobjects') and (I.status & 0x800) = 0x800 AND A1.colid <= I.keycnt) )
+ON ( A.id = I.id AND A.name = index_col('sysobjects', I.indid, A1.colid) )
+LEFT JOIN SysComments as M
+ON ( M.id = A.cdefault and ObjectProperty(A.cdefault, 'IsConstraint') = 1 )
+ORDER BY A.Colid ASC
+# 提取数据库内所有表的字段详细说明的SQL语句
+
+SELECT
+(case when a.colorder=1 then d.name else '' end) N'表名',
+a.colorder N'字段序号',
+a.name N'字段名',
+(case when COLUMNPROPERTY( a.id,a.name,'IsIdentity')=1 then '√'else ''
+end) N'标识',
+(case when (SELECT count(*)
+FROM sysobjects
+WHERE (name in
+(SELECT name
+FROM sysindexes
+WHERE (id = a.id) AND (indid in
+(SELECT indid
+FROM sysindexkeys
+WHERE (id = a.id) AND (colid in
+(SELECT colid
+FROM syscolumns
+WHERE (id = a.id) AND (name = a.name))))))) AND
+(xtype = 'PK'))>0 then '√' else '' end) N'主键',
+b.name N'类型',
+a.length N'占用字节数',
+COLUMNPROPERTY(a.id,a.name,'PRECISION') as N'长度',
+isnull(COLUMNPROPERTY(a.id,a.name,'Scale'),0) as N'小数位数',
+(case when a.isnullable=1 then '√'else '' end) N'允许空',
+isnull(e.text,'') N'默认值',
+isnull(g.[value],'') AS N'字段说明'
+FROM syscolumns a
+left join systypes b
+on a.xtype=b.xusertype
+inner join sysobjects d
+on a.id=d.id and d.xtype='U' and d.name<>'dtproperties'
+left join syscomments e
+on a.cdefault=e.id
+left join sysproperties g
+on a.id=g.id AND a.colid = g.smallid
+order by object_name(a.id),a.colorder
+# 快速获取表test的记录总数[对大容量表非常有效]
+
+快速获取表test的记录总数:
+select rows from sysindexes where id = object_id('test') and indid in (0,1)
+
+update 2 set KHXH=(ID+1)\2 2行递增编号
+update [23] set id1 = 'No.'+right('00000000'+id,6) where id not like 'No%' //递增
+update [23] set id1= 'No.'+right('00000000'+replace(id1,'No.',''),6) //补位递增
+delete from [1] where (id%2)=1
+奇数
+# 替换表名字段
+update [1] set domurl = replace(domurl,'Upload/Imgswf/','Upload/Photo/') where domurl like '%Upload/Imgswf/%'
+# 截位
+SELECT LEFT(表名, 5)

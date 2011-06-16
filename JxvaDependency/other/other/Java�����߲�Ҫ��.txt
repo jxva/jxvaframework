@@ -1,0 +1,69 @@
+Java代码走查要点
+1 尽可能不要使用import*
+写的人很方便，读的人不爽，引入多余的类影响性能
+2 尽量减少同名的类（如java.sql.Date，java.util.Date）
+3 用StringBuffer代替String
+不要这样 String str = (new String)V.Next();
+也不要String Str = s+s1+s2
+更不要for()｛
+ Str = "i"+Str;
+｝
+4不要在循环中反复定义创建变量
+for()｛String str= （new String）v.next()；｝
+5 不要在循环中使用复杂的计算
+for(int i=0;i<en.size()i++){}
+6 不要有臃肿的判断逻辑
+if(o!=null)｛
+if(o.toString()!=null){
+if(o.toString().equals(""))}
+｝
+7 合理使用equalIngoreCase
+Str.equalIngoreCase("")能使用equals（“”）尽量使用，equalsIngorCase要进行循环比较，消耗Cpu时间
+8浮点型要精确比较时不要使用＝＝，而如下进行
+Math.abs(x-0.0)<Double.MIN.value*2
+9 可能重复执行的SQl语句尽量使用preparedStatment
+10 Select语句中尽量不要使用相同的别名在Sybase 中会有问题
+select a.Fid as Fid from...
+11在sql中注意敏感的单词要回避使用
+DB2 中id flag year month name state
+Oracle 中number
+Sybase中 count 
+
+
+
+
+
+
+
+
+
+
+
+1， 尽量不要使用+号来连接字符串。
+2， 对小数据int的Integer封装，尽量的使用Integer.valueOf()创建，而不要使用new来创建。因为Integer类缓存了从-128到256个 状态的Integer。
+3， 对Boolean类，要用valueOf()或使用Boolean.TRUE或Boolean.FALSE来创建对象。我个人觉得对Boolean类用private构造函数，可能就会避免不好的使用Boolean类了。
+4， 在设计类时应尽可能地避免在类的默认构造函数中创建，初始化大量的对象。
+5， 合理的申请数组空间，如果数组中所保存的元素占用内存空间较大或数组本身长度较长的情况，我们釆用可以釆用软引用的技术来引用数组，以“提醒”JVM及时的回收垃圾内存，维护系统的稳定性。
+6，  避免创建重复的对象，我们在编写一个方法的时候应该先考虑方法里的局部对象域能否改为private static final，从而避免创建重复的对象。
+7, 把try/catch块放入循环体内，会极大的影响性能，如果编译JIT被关闭或者你所使用的一个不带JIT的JVM，性能会将下降21%之多!
+8，StringBuffer的构造器会创建一个默认大小(通常是16)的字符数组。在使用中，如果超出这个大小，就会重新分配内存，创建一个更大的数组，并将原先的数组复制过来，再丢弃旧的数组。在大多数情况下，你可以在创建StringBuffer的时候指定大小，这样就避免了在容量不够的时候自动增长，以提高性能。
+9,   使用Java NIO提高服务端程序的性能。
+10，考虑用静态工厂方法替代构造函数。
+11，在对大量的数组拷贝时，可以考虑用Arrays.copyOf()来拷贝。
+12, 在并发的情况下，要合理的选择同步的策略，应该谨慎的控制synchronized块的大小，不可以将一个操作分解到多个synchronized 但也要尽量地从synchronized块中分离耗时的且不影响并发的操作。
+13，要合理的选择集合框架，例如：ArrayList和LinkedList在某些不同的场合，其性能相差很大。对要做大量的插入时，LinkedList 的性能比ArrayList的性能好。对要做大量随机查找的时候用ArrayList的性能比用LinkedList的性能好。还有在不需要并发操作的情况下，选择非线程安全的集合比线程安全的集合要好。如在非线程安全的要求下，选择ArrayList要比Vector好。
+14，如果是想把数据封装成Double类型的，不要这样使用new Double("1.23")，而要应这样使用new Double(1.23),虽然二者都没有语法 的错误，也都能达到预期的结果，但其性能有着很大的差异。
+15, 应尽量的通过缓冲流类来提高I/O操作效率,但也要合理的选择缓冲大小 。
+    呵呵，好了，今天就写到这吧，以后要是有时间再继续写。小弟我初学java，不对之地，欢迎大家指正，补遗。
+    
+14，不要在循环语句块中调用length()方法做为循环结束的条件。
+15，如果字符串特别长，不要釆用charAt()一一的获取特定位置的字符，而应该调用toCharArray()方法转化为字符数组，然后通过数组 索引值获取指定位置的字符。
+
+
+
+14条的意思是不要这样使用
+   for(int i = 0 ; i < str.length();i++)
+  而要这样使用
+   int size = length();
+   for(int i = 0 ; i < size; i++)
+15条是因为charAt()因为每次获取指定索引位置的字符都要引起新的检索过程。 

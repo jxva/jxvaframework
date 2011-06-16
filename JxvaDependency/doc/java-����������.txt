@@ -1,0 +1,107 @@
+java-分析器解析(2009-02-01 21:01:18)
+标签：it 	分类：搜索引擎与人工智能
+1、语汇单元的组成：
+1）经过分析产生的基本单元。在索引时，Lucene使用特定的分析器来处理需要被语汇单元化的指定域，并将每个语汇单元以项的形式写入索引。
+2）起点偏移量是指语汇单元文本的起始字符在原广西中的位置，而终点的偏移量则表示语汇单元终止字符的下一个位置。
+3）文本被语汇单元化后，相对于前一语汇单元的位置信息被保存为位置增量值。所有的内置语汇单元将位置增量的默认值设置为1，表示所有语汇单元是连续的，位置上是一个紧接一个的。
+2、语汇单元转换为项
+1）当文本在索引过程中经过分析后，每个语汇单元做为一个项被传递给索引。
+2）位置增量是语汇单元携带到索引中的惟一的附加元数据。
+3）起点和终点偏移量和语汇单元类型都被抛弃了-这些元数据仅在分析过程中使用。
+4）位置增量使得当前语汇单元和前一个语汇单元 联系起来。位置增量为1，表示每个单词存于域中唯一且连接的位置。
+5）位置增量大于1，允许单词之间有空隙。比如说这些空隙上的被分析器删除
+6）位置增量为0的语汇单元，会将该语汇单元放置在前一个语汇单元的位置上。通常用于表示单词的同义词。
+3、TokenStream（基类包括next()和close()方法 ）
+1）2个不同的子类
+A)Tokenizer：将Reader对象中的数据切分为语汇单元。将String对象包装在StringReader中，进行语汇单元的切分。处理单个字符。
+具体又有以下子类：
+a)CharTokenizer：其他基于字符的Tokenizer类的父类，包含抽象方法isTokenChar()。当isTokenChar()==true时，输出连续的语汇单元块。该类能对字符规格化处理。Token对象限制的最大字符个数为255个
+b)WhitespaceTokenizer：isTokenChar()值为true时的CharTokenizer子类，用于处理所有非空格的字符
+c)LetterTokenizer:isTokenChar()值为true并且Character.isLetter()值为true时的CharTokenizer类
+d)LowCaseTokenizer：将所有字符小写化的LetterTokenizer
+e)StandardTokenier:复杂的基于语法的语汇单元切分器，用于输出高级类型的语汇单元，如E-MAIL地址等。每个输出的语汇单元标记为一个特殊类型，这些类型中的一部分需要使用StandardFilter类特殊处理。
+B)TokenFilter：允许你将多个TokenStream对象连接在一起。一个TokenStream对象被传递给TokenFilter时，由TokenFilter对其进行增加、删除和更改等，用于处理单词。
+a)LowerCaseFilter:将语汇单元文本转换为小写形式
+b)StopFilter：移除指定集合中的信用词
+c)PorterStemFilter:利用Poter词干提取算法将语汇单元还原为其词干。
+d)StandardFilter:接收一个StandardTokenizer对象做为参数。
+4、例子：关于TokenStream
+public class AnanlyzerDemo{
+private static final String[] examples={"aa adfadf fadfaf,","xx fdasf afadsf wer@qw.com"};
+private static final Analyzer[] analyzers=new Analyzer[]{
+   new WhitespaceAnalyzer(),
+   new SimpleAnalyzer(),
+   new StopAnalyzer(),
+   new StanderdAnalyzer()
+};
+public static void main(String[] args)throws IOException{
+   String[] strings=examples;
+   if (args.length>0) strings=args;
+   for (int i=0;i<strings.length;i++) analyze(strings[i]);
+}
+ 
+private static void analze(String text) throws IOException{
+  System.out.println("Analyzing \""+text+"\"");
+  for (int i=0;i<anayzers.length;i++){
+       Analyzer analyzer=analyzers[i];
+       String name=analyzer.getClass().getName();
+       name=name.substring(name.lastIndexof(".")+1);
+       System.out.println("  "+name+":");
+       System.out.print("    ");
+       AnaylyzerUtils.displayTokens(analyzer,text);
+       System.out.println("\n");
+  }
+} 
+ public class AnalyzerUtils{
+  public class Token[] tokenFromAnalysis(Analyzer analyzer,String text ) throws IOException{
+      TokenStream stream=analyzer.tokenStream("contents",new StringReader(text));
+      ArrayList tokenList=new ArrayList();
+      while (true){
+          Token token=stream.next();
+          if (token==null) break;
+          tokenList.add(token);
+      }
+     return (Token[]) tokenList.toArray(new Token[0]);
+    
+     public static void displayTokens(Analyzer analyzer,String text) throws IOException{
+         Token[] tokens=tokensFromAnalysis(analyzerm,text);
+          for (int i=0;i<tokens.length;i+){
+               Token token=tokens[i];
+               System.out.print("["+token.termText()+"]");
+          }
+     }
+    //...............其他方法
+  }
+ }
+}
+深入分析Token对象
+public static void displayTokensWithFullDetails(Analyzer analyzer,String text) throws IOException{
+     Token[] tokens=tokensFromAnalysis(analyzer,text);
+     int position =0;
+     for (int i=0;i<tokens.length;i++){
+             Token token=tokens[i];
+             
+             int increment=token.getPositionIncrement();
+             
+             if (increment>0){
+                 position=position+increment;
+                 System.out.println();
+                 System.out.print(position+":");
+             }
+            
+             System.out.print("["+token.termText()+":"+token.startoffset()
+              +"- >"+token.endoffset()+":"+token.type()+"]");
+          }
+  }
+ 
+ 
+publci static void main(String[] args) throws IOException{
+      displayTokensWithFullDetails(new SimpleAnalyzer(),"The quick brown fox....");
+下面是这段程序的输出结果
+1:[the:0->3:word]
+2:[quick:4->9:word]
+3:[brown:10-15:word]
+4:[fox:16->19:word]
+}
+     }
+}

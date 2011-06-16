@@ -1,0 +1,14 @@
+10:33:45 info  :Connection Provider Factory initializing...
+10:33:45 info  :JDBC Connection Provider initializing...
+10:33:45 info  :Database Connection Success.
+10:33:48 info  :automatic remove one connection from database connection pool,overtime is 3625 ms.
+10:34:02 info  :Connection Provider Factory initializing...
+10:34:02 info  :JDBC Connection Provider initializing...
+10:34:02 info  :com.emart.model.Apply.java generate success.
+10:34:02 info  :com.emart.model.Brief.java generate success.
+10:34:02 info  :com.emart.model.Guide.java generate success.
+10:34:02 info  :com.emart.model.Job.java generate success.
+10:34:02 info  :com.emart.dao.ApplyDao.java generate success.
+10:34:02 info  :com.emart.dao.BriefDao.java generate success.
+10:34:02 info  :com.emart.dao.GuideDao.java generate success.
+10:34:02 info  :com.emart.dao.JobDao.java generate success.

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>	
+	<sysconfig debug="true">
+		<cache-path>/cache/</cache-path>
+		<error-page>/pub/error.htm</error-page>	
+		<resubmit-page>/pub/resubmit.htm</resubmit-page>
+	</sysconfig>
+	
+	<mvc use-dao="false">
+		<modules>
+			<module remark="jxva-demo">jxva-demo.xml</module>
+		</modules>
+	</mvc>
+
+	<plugins>
+		<plugin class="com.jxva.plugin.SysPlugin"/>
+		<plugin class="com.jxva.plugin.MvcPlugin"/>
+	</plugins>
+</jxva>

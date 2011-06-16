@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	<!DOCTYPE jxva-framework PUBLIC "-//JXVA//DTD FRAMEWORK-MVC//EN" "http://www.jxva.com/dtd/jxvaframework-mvc.dtd">
+-->
+<jxva-framework>
+
+	<package name="default">
+		<action name="demo1" class="com.jxva.demo.handler.DemoHandler1"/>
+		<action name="demo2" class="com.jxva.demo.handler.DemoHandler2"/>
+	</package>
+	
+	<package name="/user">
+		<action name="demo3" class="com.jxva.demo.handler.DemoHandler3"/>
+		<action name="demo4" class="com.jxva.demo.handler.DemoHandler4"/>
+	</package>
+</jxva-framework>
+

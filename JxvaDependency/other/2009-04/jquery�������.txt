@@ -1,0 +1,72 @@
+开发第三方插件
+  开发第三方插件是我们提高JQuery代码经验的不错的选择，当我们的代码想要重用的时候，我们总是习惯把这些代码封装成一个插件，幸运的是在JQuery中这并不比写代码复杂多少。
+添加一个新的全局函数
+  JQuery的全局函数也就是属于JQuery命名空间的函数，典型的例子就是$.AJAX()这个函数。将函数定义于Jquery的命名空间，我们只需要担心，它是否与其他函数存在冲突。
+  添加一个全局函数，我们只需如下定义：
+Java代码
+
+   1. jQuery.foo = function() { alert('This is a test. This is only a test.');};    
+
+jQuery.foo = function() { alert('This is a test. This is only a test.');};  
+
+
+调用的时候可以这样写：
+Java代码
+
+   1. jQuery.foo();  
+
+jQuery.foo();
+
+
+也可以这样写：
+Java代码
+
+   1. $.foo();  
+
+$.foo();
+
+
+定义多个全局函数
+如果我们的插件需要多个全局函数，可以如下定义
+Java代码
+
+   1. jQuery.foo = function() { alert('This is a test. This is only a test.');};jQuery.bar = function(param) { alert('This function takes a parameter, which is "' + param + '".');};  
+
+jQuery.foo = function() { alert('This is a test. This is only a test.');};jQuery.bar = function(param) { alert('This function takes a parameter, which is "' + param + '".');};
+
+
+同时这两个方法我们可以如下调用
+Java代码
+
+   1. $.foo();$.bar('baz');  
+
+$.foo();$.bar('baz');
+
+
+当然我们也可以使用$.extend()这个函数扩展来代替以上的定义
+Java代码
+
+   1. jQuery.extend({ foo: function() { alert('This is a test. This is only a test.'); }, bar: function(param) { alert('This function takes a parameter, which is "' + param +'".'); }});  
+
+ jQuery.extend({ foo: function() { alert('This is a test. This is only a test.'); }, bar: function(param) { alert('This function takes a parameter, which is "' + param +'".'); }});
+ 
+
+
+以上效果是相同的，虽然在Jquery命名空间中，我们禁止使用了大量的javaScript函数名和变量名。但是仍然不可避免某些函数或变量名将于其他Jquery插件冲突，因此我们习惯将一些方法封装到另一个自定义的命名空间。
+Java代码
+
+   1. jQuery.myPlugin = { foo: function() { alert('This is a test. This is only a test.'); }, bar: function(param) { alert('This function takes a parameter, which is "' + param + '".'); }};  
+
+ jQuery.myPlugin = { foo: function() { alert('This is a test. This is only a test.'); }, bar: function(param) { alert('This function takes a parameter, which is "' + param + '".'); }};
+ 
+
+
+当然我们仍然可以认为这些函数为全局函数，我们可以如下调用
+Java代码
+
+   1. $.myPlugin.foo();$.myPlugin.bar('baz');  
+
+ $.myPlugin.foo();$.myPlugin.bar('baz');
+
+
+通过这个技巧（使用独立的插件名），我们可以避免命名空间内函数的冲突。 

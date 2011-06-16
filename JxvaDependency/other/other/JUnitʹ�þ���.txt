@@ -1,0 +1,171 @@
+译者注:
+很多测试人员都有过编写测试框架的经历，JUnit的出现避免了其中的大量重复劳动。但如同其
+他的工具一样用得好和用得差的结果是截然不同的。我们编辑这样一个JUnit的系列希望能够帮助越
+来越多的JUnit使用者用好JUnit。我们也希望读者们能够把自己的一些经验所得和大家分享。
+
+经验一、不要在测试用例的构造函数中做初始化
+当我们需要增加一个测试时，我们要书写一个自己的测试用例，比如SomeTest。如果你喜欢在SomeTest的
+构造函数中做有关的初始化工作，这可不是个好习惯。如下例：
+public class SomeTest extends TestCase{
+public SomeTest(String testName){
+super(testName);
+//初始化代码
+}
+}
+一旦初始化代码产生异常，比如IllegalStateException，JUnit随之将产生一个AssertionFailedError，
+并显示类似下面的出错信息：
+j u n i t . f r a m e w o r k . A s s e r t i o n F a i l e d E r r o r : C a n n o t i n s t a n t i a t e t e s t c a s e : t e s t 1 a t
+j u n i t . f r a m e w o r k . A s s e r t . f a i l ( A s s e r t . j a v a : 1 4 3 ) a t
+j u n i t . f r a m e w o r k . T e s t S u i t e $ 1 . r u n T e s t ( T e s t S u i t e . j a v a : 1 7 8 ) a t
+j u n i t . f r a m e w o r k . T e s t C a s e . r u n B a r e ( T e s t C a s e . j a v a : 1 2 9 ) a t
+j u n i t . f r a m e w o r k . T e s t R e s u l t $ 1 . p r o t e c t ( T e s t R e s u l t . j a v a : 1 0 0 ) a t
+j u n i t . f r a m e w o r k . T e s t R e s u l t . r u n P r o t e c t e d ( T e s t R e s u l t . j a v a : 1 1 7 ) a t
+j u n i t . f r a m e w o r k . T e s t R e s u l t . r u n ( T e s t R e s u l t . j a v a : 1 0 3 ) a t
+j u n i t . f r a m e w o r k . T e s t C a s e . r u n ( T e s t C a s e . j a v a : 1 2 0 ) a t
+j u n i t . f r a m e w o r k . T e s t S u i t e . r u n ( T e s t S u i t e . j a v a , C o m p i l e d C o d e ) a t
+j u n i t . u i . T e s t R u n n e r $ 1 2 . r u n ( T e s t R u n n e r . j a v a : 4 2 9 )
+这一大堆出错信息只会让人一头雾水，我们只知道JUnit无法实例化某个测试用例，到底出了什么问题，在
+哪儿出错了呢？不知道！
+那么好的做法是怎样呢？
+答案是重载测试用例的setUp()方法进行初始化。当setUp()中的初始化代码产生异常时我们得到的
+是类似下面的出错信息：
+j a v a . l a n g . I l l e g a l S t a t e E x c e p t i o n : O o p s a t b p . D T C . s e t U p ( D T C . j a v a : 3 4 ) a t
+j u n i t . f r a m e w o r k . T e s t C a s e . r u n B a r e ( T e s t C a s e . j a v a : 1 2 7 ) a t
+j u n i t . f r a m e w o r k . T e s t R e s u l t $ 1 . p r o t e c t ( T e s t R e s u l t . j a v a : 1 0 0 ) a t
+j u n i t . f r a m e w o r k . T e s t R e s u l t . r u n P r o t e c t e d ( T e s t R e s u l t . j a v a : 1 1 7 ) a t
+j u n i t . f r a m e w o r k . T e s t R e s u l t . r u n ( T e s t R e s u l t . j a v a : 1 0 3 )
+...
+显然这要清楚得多我们一下子就可以知道是在DTC.java 的第34 行产生了IllegalStateException
+
+经验二、不要假定测试用例中测试的执行次序
+我们知道在一个JUnit 的测试用例类中可以包含多个测试，每个测试其实就是一个method。在下面的例子
+中有两个不同的测试，尽管testDoThisFirst()在位置上先于testDoThisSecond()，但我们不能就此假定
+testDoThisFirst()会先执行。
+public class SomeTestCase extends TestCase{
+public SomeTestCase(String testName){
+super(testName);
+}
+public void testDoThisFirst(){
+...
+}
+public void testDoThisSecond(){
+}
+}
+由于JUnit 内部使用一个Vector 来存储所有的test，因此在不同的操作系统和Java 虚拟机上，test 的执行
+次序是不可预测的。
+好的习惯是保持测试之间的独立性，使得它们在任何次序下执行的结果都是相同的。如果真得需要某些测试
+按照特定的次序执行，我们可以借助addTest 来实现。如下例：
+public static Testsuite(){
+suite.addTest(new SomeTestCase(“testDoThisFirst”;));
+suite.addTest(new SomeTestCase(“testDoThisSecond”;));
+return suite;
+}
+这样我们可以确保JUnit先执行testDoThisFirst()，然后执行testDoThisSecond()。
+
+经验三、测试要避免人工干预
+如果某段测试代码需要人工干预，那至少有两个不良后果：一则不能被包括在自动测试中，比如夜间的回
+归测试；二则不能被重复执行，例如数据删除的测试不能做完删除就万事大吉，比较好的做法是自动补上
+删除掉的数据。经验二讲的是不同的测试要避免相关性，而经验三讲的其实就是测试要避免自相关。
+
+经验四、在子类中调用父类的setup() 和teardown()
+让我们看一看下面的代码
+public class sometestcase extends anothertestcase {
+// a connection to a database
+private database thedatabase;
+public sometestcase (string testname) {
+super (testname);
+}
+public void testfeaturex () {
+...
+}
+public void setup () {
+// clear out the database
+thedatabase.clear ();
+}
+}
+你发现其中的错误了吗？setup()应该调用super.setup() 以确保anothertestcase 中定义的环境被初
+始化了。当然这也有例外，就是基类可以处理任意的测试数据。
+
+经验五、不要硬性规定数据文件的路径
+我们经常需要从文件系统中读取测试数据，看下面的代码：
+public void setup () {
+fileinputstream inp ("c:\\testdata\\dataset1.dat");
+...
+}
+这段代码需要把测试数据文件dataset1.dat 放在c:\testdata，这是有问题的。
+第一，c 盘可能没有磁盘空间了测试人员不得不把数据文件放到其他路径；
+第二，可能需要在其他操作系统比如linux 上执行这一测试。
+所以，一个较好的替代方案是
+public void setup () {
+fileinputstream inp ("dataset1.dat");
+...
+}
+但事实上这样仍不是很好，因为这要求数据文件的路径和测试执行的路径必须是同一个，如果几个不同
+的测试都这样的话，那要把这些测试集合起来执行就有些困难，我们不得不频繁的改变当前路径。
+为了解决这个问题，我们可以使用class.getresource()或者class.getresourceasstream()，这样我
+们可以把数据文件放在这个class 的某个相对路径上。
+数据文件应该尽可能和源代码一起都放在配置管理系统上，但这样一来如果我们采用上面的resource 机
+制，我们就需要做一件工作，就是把数据文件从原来的位置－就是源代码的某个相对路径，拷贝到编译后
+的位置，也就是class 文件的相应的相对路径。这其实并不复杂，因为从class 的package 就可以映射到
+java文件的所在路径对于linux或者windows我们所要做的就是把package中的. 用
+file.separatorchar 替代。
+
+经验六、把测试的代码和被测的代码放在同样的目录下
+当我们把测试代码和被测的代码放在同一目录下时，我们就可以在编译被测代码的同时编译测试代码，从
+而确保两者是同步更新的。事实上当前的普遍做法，就是把单元测试视为build 的一个环节。
+
+经验七、正确命名测试
+把测试用例命名为testclassundertest，比如如果被测的class 是messagelog，那么测试用例就叫
+testmessagelog，这样做使得测试用例和被测的class一一对应，而在测试用例中每个测试的method 就
+可以命名为
+testloggingemptymessage()
+testloggingnullmessage()
+testloggingwarningmessage()
+testloggingerrormessage()
+同样是为了说清楚测试的是什么。正确的命名可以帮助测试代码的阅读者了解每个测试的目的。
+
+经验八、书写测试时要考虑地区和国家设置
+比如某个测试要使用日期，下面的代码就是创建日期对象的一种方法
+Date date = DateFormat.getInstance ().parse ("dd/mm/yyyy");
+但是如果运行上面测试代码的机器采用不同的地区国家设置，那么就会有问题。因此我们最好用下面的另
+一种方法：
+Calendar cal = Calendar.getInstance ();
+Cal.set (yyyy, mm-1, dd);
+Date date = Calendar.getTime ();
+显然，第二种方法能够适应地区国家设置的变化。
+
+经验九、利用Junit 的自动异常处理书写简洁的测试代码
+很多Junit 的初学者经常会写出类似下面的这些代码
+public void exampleTest () {
+try {
+// do some test
+} catch (SomeApplicationException e) {
+fail ("Caught SomeApplicationException exception");
+}
+}
+事实上在Junit 中使用try-catch 来捕获异常是没有必要的，Junit 会自动捕获异常。那些没有被捕获的异常就
+被当成错误处理。所以上面的代码很冗余，完全可以写成下面等效却简洁得多的代码：
+public void exampleTest () throws SomeApplicationException {
+// do some test
+}
+更少的测试代码也更容易读懂更容易维护。
+
+经验十、充分利用Junit 的assert/fail 方法
+Junit 有丰富而灵活的assert/fail 方法，如何用好这些方法也是大有讲究的。比如下面的写法就不大好
+assert (creds == 3);
+不如写成
+assertEquals ("The number of credentials should be 3", 3, creds);
+第二种写法不仅易于阅读，而且在执行时如果fail 也可以向测试人员提供更多的信息。
+Junit 也有支持浮点数的assert方法，干净利索如下例
+assertEquals ("some message", result, expected, delta);
+另外要一提的是：
+assertSame()用来测试两个引用是否指向同一个对象
+assertEquals()用来测试两个对象是否相等
+
+经验十一、确保测试代码与时间无关
+尽量避免可能过期的测试数据，这种数据应该可以手工或者自动的刷新。另外还有一个技巧就是在使用这些
+数据前更改系统的当前日期，数据操作结束后再恢复日期。当然，使用这一技巧要注意可能的副作用。
+
+经验十二、使用文档生成器做测试文档
+我们当然可以使用文本编辑器来书写单元测试的文档，但是更好的方法是使用文档生成器比如JavaDoc自
+动生成，这样我们就不需担心实现和文档之间的同步问题。自动生成的文档格式统一错误也少。

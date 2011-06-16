@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+	<app-config name="ztemusic">
+		<para name="cache">true</para>
+		<para name="cacheTime">1440</para>
+		<para name="http">http://127.0.0.1:8080/ztemusic/</para>
+	</app-config>
+</jxva>

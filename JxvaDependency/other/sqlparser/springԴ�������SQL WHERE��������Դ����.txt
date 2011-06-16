@@ -1,0 +1,105 @@
+关于SQL的Where条件正则解析
+目标：解析常用的SQL中的Where条件
+Test: a.id in (1,2,3) and a.name='adsfasdf''adfasdf''''adfasdf''' or a.type='aas' or a.test1 exists(select * from b where b.id in (1,2,3,4)) and 1=1 and (a.id = 1 or a.type=2) and (c.dfafd=adsfasf and c.daat='adfafda') and a.id between 10 and 20 or a.name not like 'test%'
+分解后得到的对像应该是
+tree ----- or
+-----and
+a.id in (1,2,3)
+a.name=''adsfasdf''adfasdf''''adfasdf'''
+-----and
+a.type='aas'
+-----and
+a.test1 exists(select * from b where b.id in (1,2,3))
+1=1
+-------or
+a.id=1
+a.type=2
+--------and
+c.dfafd=adsfasf
+c.daat='adfafda'
+a.id between 10 and 20
+结构为：
+OR
+|----------------------------------------|---------------------------------------|
+AND AND AND
+|------|---------| | |----------|------------------|--------------------------|----------------|
+a.id a.name a.type a.test1 1=1 OR AND a.id
+|-------|-------| |----------|--------|
+a.id a.type c.dfafd c.daat
+
+
+1、先将括号中及引号中的数据独立出来。
+1)引号：'[^']*('')*[^']*'
+2)括号：(?<tag1>\s*\([^\(\)]*\))
+2、由于引号最大，因此先将其中的所有引号及括号中的匹配值记录下来，并替换SQL中的表达式，以简化其结构。
+得到结果：
+ClearString: a.id in [_1000] and a.name= [_0] or a.type= [_1] or a.test1 exists [_1004] and 1=1 and [_1002] and [_1003] and a.id between 10 and 20 or a.name not like [_3]
+组：
+'adsfasdf''adfasdf''''adfasdf'''
+'aas'
+'adfafda'
+----------Parenthesis--------------
+(1,2,3)
+(1,2,3,4)
+(a.id = 1 or a.type=2)
+(c.dfafd=adsfasf and c.daat= [_2] )
+(select * from b where b.id in [_1000] )
+
+3、分解每一个比较单元
+语法分解难点：
+[_1002] and [_1003] and a.id between 10 and 20
+正则表达式：
+(?<fieldname>[^\s'=><]+)\s*(?<comparetype>[^\s'\d]+)\s*(?<value>[^\s]+)(?<join>\s+(and|or)+)?
+无法正确解析，得到结果如下：
+id ContainsIn [_1000] and
+name Equal [_0] or
+type Equal [_1] or
+test1 Exists [_1004] and
+1 Equal 1 and
+[_1000] Equal [_1000] and
+id Equal 10 and
+最后两行是错误的。
+表达式改进如下，可以解决此问题。
+(?(\[_\d{1,4}\])(?<singlesyntax>\[_\d{1,4}\])|((?<fieldname>[^\s'=><]+)\s*
+((?(between)
+|((?<comparetype>=|>=|<=|<>|>|<|like|in|contains\s+in|exists|not\s+in|not\s+like|not\s+exists)\s*(?<value>[^\s]+))))))
+|((?<comparetype>[^\s'\d]+)\s*(?<value>[^\s]+))))))
+(?<join>\s+(and|or)+)?
+这里使用了两个决策：1)判断是否为一个单独的缩编SQL 2)判断是否为一个Between类型
+3)对于Not Like，Not In此类的比较符处理不正确，需要更进一步优化正则表达式：通过组合枚举所有的操作符解决此问题。
+此前发现一个BUG，即后面的更新可能将前面的值更新错。因此需要转换一种更新方式。
+原来为'{0}'这种形式，中间为此字串在缓存中的位置
+现更新为[_{0}]这种形式，因为在SQL中一般不会用到数组类型的东东。下标不会是有_的形式，这样可靠性更好。
+
+输出结果如下：
+Or
+|--Item--
+| |----a.type Equal 'aas' or
+| |----a.name NotLike 'test%'
+|--Tree--
+| |----And
+| |--Item--
+| | |----a.id ContainsIn (1,2,3) and
+| | |----a.name Equal 'adsfasdf''adfasdf''''adfasdf''' or
+| |--Tree--
+| |----And
+| |--Item--
+| | |----a.test1 Exists (select * from b where b.id in (1,2,3,4) ) and
+| | |----1 Equal 1 and
+| | |----a.id Between 10 AND 20 or
+| |--Tree--
+| | |----Or
+| | |--Item--
+| | | |----a.id Equal 1 or
+| | | |----a.type Equal 2
+| | |--Tree--
+| | |----And
+| | |--Item--
+| | | |----c.dfafd Equal adsfasf and
+| | | |----c.daat Equal 'adfafda'
+| | |--Tree--
+
+
+下一步需要进行如下工作：
+1)需要结合一些条件，将这些语句输出成为标准的SQL语句。OK
+2)与Grid的整合。OK

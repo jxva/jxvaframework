@@ -1,0 +1,5 @@
+sqlserver的String or binary data would be truncated 异常解决办法
+
+一般出现这个问题是因为数据库中的某个字段的长度小，而插入数据大
+
+解决办法：alter table TABLENAME alter column COLUMNNAME  VARCHAR(65) ;

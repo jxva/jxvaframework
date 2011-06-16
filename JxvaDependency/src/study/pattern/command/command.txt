@@ -1,0 +1,95 @@
+在早期，许多的应用程序还只能提供单一的Undo/Redo，自进入90年代以来，随着OOP及Design Pattern的流行，实现无限次数的Undo/Redo编辑功能已不是难事。
+
+每一个编辑动作我们可以把它当成一个命令，如cut,del等，在做每一个编辑动作前，我们先要保存旧的数据，以便于undo它。我们为这些编辑命令设计了如下一个通用接口:
+public Interface Command
+{
+
+    public void execute();　
+
+    public void undo();
+
+}
+其中execute用来执行命令,undo用来恢复(undo).
+
+接下来实现这个接口,先来实现Cut命令:
+public class CutCommand implements Command
+{
+
+    public void execute()
+    {
+        /* 备份旧数据 */
+        /* 剪切 */
+
+    }
+
+    public void undo()
+    {
+         /*  还原成备份的数据  */
+    }
+
+}
+
+再来实现一个Delete命令:
+public class DeleteCommand implements Command
+{
+
+    public void execute()
+    {
+        /* 备份旧数据 */
+        /* 删除 */
+
+    }
+
+    public void undo()
+    {
+         /*  还原成备份的数据  */
+    }
+
+}
+
+OK,我们就只列出了cut和del两个命令,其它的命令相似的写法.
+
+这样的话我们每做一个编辑动作,就执行一个相应的command.接下来我们要考虑如何将这些执行过的命令保存下来,以实现undo/redo. 我们再设计一个CommandManager:
+public Interface CommandManager
+{
+    public void storeCommand(Command cmd);
+    public void clearAllCommand();
+    public void undo();
+    public void redo();
+}
+再来实现一个CommandManager, 我们称作CommandHistoryManager:
+public class CommandHistoryManager implements CommandManager
+{
+ Vector undoList=new Vector();
+ Vector redoList=new Vector();
+ 
+ 
+ public void storeCommand(Command cmd)
+ {
+  undoList.add(cmd);
+ }
+ public void clearAllCommand()
+ {
+  undoList.clear();
+  redoList.clear();
+ }
+ public void undo()
+ {
+        if ( undoList.size() <= 0 ) return;
+        Command cmd = ((Command)(undoList.get(undoList.size()-1)));
+        cmd.undo();
+        undoList.remove(cmd);
+        redoList.add(cmd);
+ }
+ public void redo()
+ {
+        if ( redoList.size() <= 0 ) return;
+        Command cmd = ((Command)(redoList.get(redoList.size()-1)));
+        cmd.execute();
+        redoList.remove(cmd);
+        undoList.add(cmd);
+  
+ }
+ 
+}
+通过storeCommand()方法，每次执行的command就可以保存到undoList中，假设再在我们在程序中放置了两个按钮，一个undo,一个redo.按下undo按钮，就执行CommandHistoryManager的undo()方法，undo()方法会调用undoList中保存的最后一个command的undo()方法，并将这个command再放到redoList中，最后从undoList中删除这个命令。这时如果再按 redo按钮，它会调用CommandHistoryManager中的redo()方法。redo()方法会调用redoList中保存的最后一个 command的execute()方法，并将这个command又存回到undoList中。这样就实现了无限次数的undo/redo功能。

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+		<interface>
+			<return_code><![CDATA[ 433 ]]></return_code>
+			<return_msg><![CDATA[ 异常详细信息 ]]></return_msg>
+		</interface>

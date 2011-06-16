@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+	<display-name>Ztemt Website Portal</display-name>
+
+	<!--Jxva Framework CoreFilter Configure-->
+	<filter>
+		<filter-name>CoreFilter</filter-name>
+		<filter-class>com.jxva.filter.CoreFilter</filter-class>
+		<init-param>
+			<param-name>FilterInvoke</param-name>
+			<param-value>default</param-value>
+		</init-param>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ignore</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CoreFilter</filter-name>
+		<servlet-name>action</servlet-name>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CoreFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+
+	
+    <!-- 单点登录客户端配置 -->
+
+    <filter>
+		<filter-name>SSOClient</filter-name>
+		<filter-class>com.ztemt.passport.sso.SSOClient</filter-class>
+		<init-param>
+			<param-name>SSOServer</param-name>
+			<param-value>http://shop.ztemt.com.cn/passport/SSOServer.action</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Authorization</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>SSOClient</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>SSOClient</filter-name>
+		<url-pattern>*.zte</url-pattern>
+	</filter-mapping>
+
+	<!-- Jxva Framework MVC Configure-->
+	<servlet>
+    	<servlet-name>Initializers</servlet-name>
+    	<servlet-class>com.jxva.mvc.Initializers</servlet-class>
+    	<load-on-startup>1</load-on-startup>
+  	</servlet>
+	<servlet>
+    	<servlet-name>Controller</servlet-name>
+    	<servlet-class>com.jxva.mvc.Controller</servlet-class>
+  	</servlet>
+  	<servlet-mapping>
+    	<servlet-name>Controller</servlet-name>
+    	<url-pattern>*.zte</url-pattern>
+  	</servlet-mapping>
+
+  	
+  	<!-- suppert shtml and need to add content node's attribute (privileged="true") in tomcat's context.xml  --> 
+  	<servlet>
+      <servlet-name>ssi</servlet-name>
+      <servlet-class>org.apache.catalina.ssi.SSIServlet</servlet-class>
+      <init-param>
+          <param-name>buffered</param-name>
+          <param-value>1</param-value>
+      </init-param>
+      <init-param>
+          <param-name>inputEncoding</param-name>
+          <param-value>UTF-8</param-value>
+      </init-param>
+      <init-param>
+          <param-name>outputEncoding</param-name>
+          <param-value>UTF-8</param-value>
+      </init-param>
+      <init-param>
+		<param-name>isVirtualWebappRelative</param-name>
+		<param-value>1</param-value>
+	  </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>ssi</servlet-name>
+      <url-pattern>*.shtml</url-pattern>
+    </servlet-mapping>
+
+    <mime-mapping>
+      <extension>shtml</extension>
+      <mime-type>text/html</mime-type>
+    </mime-mapping>
+  	   	  	
+  	<servlet>
+	    <servlet-name>proxool</servlet-name>
+	    <servlet-class>org.logicalcobwebs.proxool.admin.servlet.AdminServlet</servlet-class>
+	</servlet>
+ 	<servlet-mapping>
+    	<servlet-name>proxool</servlet-name>
+    	<url-pattern>/proxool</url-pattern>
+  	</servlet-mapping>
+		
+  	<session-config>
+    		<session-timeout>30</session-timeout>
+  	</session-config>
+  
+ 
+  
+     <jsp-config>
+        <jsp-property-group>
+            <description>
+                Special property group for JSP Configuration JSPexample.
+            </description>
+            <display-name>JSPConfiguration</display-name>
+            <url-pattern>*.jsp</url-pattern>
+            <el-ignored>false</el-ignored>
+            <page-encoding>UTF-8</page-encoding>
+            <scripting-invalid>false</scripting-invalid>
+            <include-prelude></include-prelude>
+            <include-coda></include-coda>
+
+            <description>
+                Special property group for JSP Configuration JSPexample.
+            </description>
+            <display-name>JSPConfiguration</display-name>
+            <url-pattern>*.html</url-pattern>
+            <el-ignored>false</el-ignored>
+            <page-encoding>UTF-8</page-encoding>
+            <scripting-invalid>false</scripting-invalid>
+            <include-prelude></include-prelude>
+            <include-coda></include-coda>
+        </jsp-property-group>
+    </jsp-config>
+  	
+</web-app>

@@ -1,0 +1,72 @@
+一.基础知识
+    单密码体系是一种传统的加密算法,是指信息的发送方和接收方共同使用相同的密码进行加解密.
+    单密码体系的代表是(US)DES
+
+二.使用方法
+    1.生成密钥,如需保存可参考数字签名部分的generateKeyPairIntoFile()方法
+    KeyGenerator keygen=KeyGenerator.getInstance(algrithm);   对于JCE来讲algrithm支技DES,DESede,Blowfish三种加密术
+    2.使用密钥加密原文
+    Cipher c=Cipher.getInstance(algrithm);
+    c.init(Cipher.ENCRYPT_MODE,key);
+    byte [] bytes=c.doFinal(info.getBytes());
+    3.用密钥解密密文
+    Cipher c=Cipher.getInstance(algrithm);
+    c.init(Cipher.DECRYPT_MODE,key);
+    byte [] bytes=c.doFinal(info.getBytes());
+三.示例代码
+
+/*
+ * Created on 2005-3-22
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package org.redtroy;
+import java.security.*;
+import javax.crypto.*;
+import java.io.*;
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class DES {
+    private String algrithm;
+    private SecretKey key;
+    private void init(String algrithm){
+        Security.addProvider(new com.sun.crypto.provider.SunJCE());
+        this.algrithm=algrithm;
+    }
+    private void generateKey() throws Exception{
+        KeyGenerator keygen=KeyGenerator.getInstance(this.algrithm);
+        SecretKey key=keygen.generateKey();
+        this.key=key;
+    }
+    private byte [] DESEncode(String src) throws Exception{
+        Cipher c=Cipher.getInstance(this.algrithm);
+        c.init(Cipher.ENCRYPT_MODE,key);
+        byte [] bytes=c.doFinal(src.getBytes());
+        return bytes;
+    }
+    private byte [] DESDecode(byte [] tar) throws Exception{
+        Cipher c=Cipher.getInstance(this.algrithm);
+        c.init(Cipher.DECRYPT_MODE,key);
+        byte [] bytes=c.doFinal(tar);
+        return bytes;
+    }
+
+    public static void main(String[] args) {
+        DES des=new DES();
+        des.init("DES");
+        try{
+        des.generateKey();
+        byte [] result=des.DESEncode("redtroy");
+        System.out.println(new String(result));
+        byte [] resultafter=des.DESDecode(result);
+        System.out.println(new String(resultafter));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+}

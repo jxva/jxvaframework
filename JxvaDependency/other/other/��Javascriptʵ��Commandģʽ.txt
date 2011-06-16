@@ -1,0 +1,42 @@
+这个实现实在太简单了………动态语言就是好使啊~
+先定义一个Command对象，代码如下：
+
+function Command(obj) {
+    var commandObj = obj;       // save the reference of working object
+    var oldProp = new Object(); // save old properties
+   
+    // set new properties and save old properties
+    this.Do = function() {
+        for (var o in this) {
+            oldProp[o] = commandObj[o];
+            commandObj[o] = this[o];
+        }
+    }
+   
+    // restore old properties
+    this.Undo = function() {
+        for (var o in oldProp) {
+            commandObj[o] = oldProp[o];
+        }
+
+        delete oldProp;
+        oldProp = new Object();
+    }
+}
+
+如果要调用，这样写就可以了：
+
+// "mc" is an object that has _alpha and _x attributes
+
+var com = new Command(mc);
+com._alpha = 20;
+com._x = 200;
+com.Do();
+// do something...
+// remember to save this Command somewhere...
+
+// now, undo it!
+com.Undo();
+
+
+为这样的简单而和谐 惊叹了！

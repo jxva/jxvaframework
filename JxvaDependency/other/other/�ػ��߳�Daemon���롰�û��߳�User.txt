@@ -1,0 +1,77 @@
+Java有两种Thread：“守护线程Daemon”与“用户线程User”。
+我们之前看到的例子都是用户，守护线程是一种“在后台提供通用性支持”的线程，它并不属于程序本体。
+从字面上我们很容易将守护线程理解成是由虚拟机（virtual machine）在内部创建的，而用户线程则是自己所创建的。事实并不是这样，任何线程都可以是“守护线程Daemon”或“用户线程User”。他们在几乎每个方面都是相同的，唯一的区别是判断虚拟机何时离开：
+用户线程：Java虚拟机在它所有非守护线程已经离开后自动离开。
+守护线程：守护线程则是用来服务用户线程的，如果没有其他用户线程在运行，那么就没有可服务对象，也就没有理由继续下去。
+setDaemon(boolean on)方法可以方便的设置线程的Daemon模式，true为Daemon模式，false为User模式。setDaemon(boolean on)方法必须在线程启动之前调用，当线程正在运行时调用会产生异常。isDaemon方法将测试该线程是否为守护线程。值得一提的是，当你在一个守护线程中产生了其他线程，那么这些新产生的线程不用设置Daemon属性，都将是守护线程，用户线程同样。
+
+import java.io.IOException;
+/**
+* 守护线程在没有用户线程可服务时自动离开
+* @author 五斗米
+* @blog http://blog.csdn.net/mq612
+*/
+public class TestMain4 extends Thread ...{
+    
+    public TestMain4() ...{
+     }
+    /** *//**
+      * 线程的run方法，它将和其他线程同时运行
+     */
+    public void run() ...{
+        for(int i = 1; i <= 100; i++)...{
+            try ...{
+                 Thread.sleep(100);
+             } catch (InterruptedException ex) ...{
+                 ex.printStackTrace();
+             }
+             System.out.println(i);
+         }
+     }
+    
+    public static void main(String [] args)...{
+         TestMain4 test = new TestMain4();
+         test.setDaemon(true);
+         test.start();
+         System.out.println("isDaemon = " + test.isDaemon());
+        try ...{
+             System.in.read(); // 接受输入，使程序在此停顿，一旦接收到用户输入，main线程结束，守护线程自动结束
+         } catch (IOException ex) ...{
+             ex.printStackTrace();
+         }
+     }
+
+}
+
+例：我们所熟悉的Java垃圾回收线程就是一个典型的守护线程，当我们的程序中不再有任何运行中的Thread，程序就不会再产生垃圾，垃圾回收器也就无事可做，所以当垃圾回收线程是Java虚拟机上仅剩的线程时，Java虚拟机会自动离开。
+
+再看看一个守护线程的例子吧
+
+public class DeamonThread extends Thread {
+public void run(){
+   try{
+    for(int i=0;i<10;i++){
+     Thread.sleep(1000);
+     System.out.println(i);
+    }
+   }
+   catch(Exception e){
+    e.printStackTrace();
+   }
+}
+public static void main(String[] args) {
+   Thread thread=new DeamonThread();
+   thread.setDaemon(true);
+   thread.start();
+}
+}
+
+你说这个程序会打印出什么信息呢？？
+数字吧？？？
+如果我们把
+thread.setDaemon(true);删除，那么就可以打印出数字了。
+
+那他打印什么呢？
+结果是什么也不打印。
+
+这就是守护线程，守护着最后一个用户线程，如果没有用户线程了，他也没作用了。不退出等什么？？

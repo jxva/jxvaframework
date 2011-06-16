@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+
+	<package namespace="default">
+		<action name="framework" class="com.jxva.mvc.FrameworkAction"/>
+		<action name="test" class="org.jxva.demo.TestAction"/>
+		<action name="xtag" class="org.jxva.demo.XTagAction"/>
+		<action name="mtag" class="org.jxva.demo.MTagAction"/>
+	</package>
+	
+</jxva>
+

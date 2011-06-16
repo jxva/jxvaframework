@@ -1,0 +1,179 @@
+用Java Mail发送带有图片的html格式的邮件，针对于显示图片，一般有两种方法。 
+
+1. 图片存在于服务器上，我们只需要把图片在服务器的的链接放进去即可。 
+这种发式比较简单，但是这种方法有些缺陷： 
+图片不支持离线浏览； 
+每次浏览邮件需要访问web服务，增加服务器负担； 
+若图片以二进制的方式存在于数据库或是动态生成的，则无法有效的解决。 
+
+2. 把图片以附件的方式发送出去，这种方式非常适用于图片存在于数据库中的情况。 
+本文也主要讨论这种情况。 
+
+对于Java Mail的基础知识，请看http://www.yesky.com/SoftChannel/72348977504190464/20020713/1620276.shtml， 
+本文不作介绍了。 
+
+说到邮件中的附件，我不得不说一说MiniMultipart类，提供了在邮件中加入附加的实现方法。 
+一个多部分邮件是一个内容类型（content-type）被设置为MiniMultipart的Message对象。 
+MiniMultipart类是一个容器类，包含MimeBodyPart类型的对象。 
+我们可以用一个MimeBodyPart包含html源代码，其他的MimeBodyPart包含二进制的图片附件。 
+
+但是这里有个意外情况，我们先看MimeBodyPart的初始化代码： 
+
+MimeBodyPart mdp = new MimeBodyPart(); //新建一个存放附件的BodyPart 
+DataHandler dh = new DataHandler(...); 
+mdp.setDataHandler(dh); //给BodyPart对象设置内容为dh 
+其中当DataHandler初始化时需要DataSource的子类 
+
+/** from JDK Doc */ 
+public DataHandler(DataSource ds) 
+Create a DataHandler instance referencing the specified DataSource. 
+The data exists in a byte stream form. The DataSource will provide an InputStream to access the data. 
+Parameters:ds - the DataSource 
+
+在JDK1.4中，DataSource是个Interface,DataSource仅有MimePartDataSource, URLDataSource, FileDataSource三个子类， 
+而在这三个类中没有一个能直接用二进制流(byte[])创建实例。当然我们可以把内存中的二进制流写到文件中，再让FileDataSource读进来。 
+但是这样会给服务器带来而外的硬盘读写，若操作频繁，会造成服务器性能下降。幸运的是我再网上发现了这么一个类，可以直接用二进制流直接创建实例。 
+
+import java.io.*; 
+import javax.activation.*; 
+public class ByteArrayDataSource implements DataSource 
+{ 
+/*** Data to write. */ 
+private byte[] _data; 
+/*** Content-Type. */ 
+private String _type; 
+
+/* Create a datasource from an input stream */ 
+public ByteArrayDataSource(InputStream is,String type) 
+{ 
+_type = type; 
+try 
+{ 
+ByteArrayOutputStream os = new ByteArrayOutputStream(); 
+int ch; 
+
+// XXX : must be made more efficient by 
+// doing buffered reads, rather than one byte reads 
+while ((ch = is.read()) != -1) 
+os.write(ch); 
+_data = os.toByteArray(); 
+} 
+catch (IOException ioe) 
+{ 
+} 
+} 
+/* Create a datasource from a byte array */ 
+public ByteArrayDataSource(byte[] data,String type) 
+{ 
+_data = data; 
+_type = type; 
+} 
+/* Create a datasource from a String */ 
+public ByteArrayDataSource(String data,String type) 
+{ 
+try 
+{ 
+// Assumption that the string contains only ascii 
+// characters ! Else just pass in a charset into this 
+// constructor and use it in getBytes() 
+_data = data.getBytes("iso-8859-1"); 
+} 
+catch (UnsupportedEncodingException uee) 
+{ 
+} 
+_type = type; 
+} 
+public InputStream getInputStream() 
+throws IOException 
+{ 
+if (_data == null) 
+throw new IOException("no data"); 
+return new ByteArrayInputStream(_data); 
+} 
+public OutputStream getOutputStream() 
+throws IOException 
+{ 
+throw new IOException("cannot do this"); 
+} 
+public String getContentType() 
+{ 
+return _type; 
+} 
+public String getName() 
+{ 
+return "dummy"; 
+} 
+} 
+
+有了上面ByteArrayDataSource类，我们就可以发送图片附件的邮件了。 
+{ 
+String smtpHost = ...; 
+String to = ...; 
+String from = ...; 
+String name = ...; 
+String password = ...; 
+String subject = ...; 
+StringBuffer content = ...; // 邮件的html源代码 
+LinkedList attachList = ...; // 附件的list,它的element都是byte[],即图片的二进制流 
+
+Properties props = new Properties(); 
+props.put("mail.smtp.host", smtpHost); 
+props.put("mail.smtp.auth", "true"); 
+Session session = Session.getDefaultInstance(props, null); 
+
+MimeMessage message; 
+InternetAddress[] address = {new InternetAddress(to)}; 
+
+message = new MimeMessage(session); 
+message.setFrom(new InternetAddress(from)); 
+message.setRecipients(Message.RecipientType.TO, address); 
+message.setSubject(subject); 
+message.setSentDate(new Date()); 
+// 新建一个MimeMultipart对象用来存放BodyPart对象(事实上可以存放多个) 
+MimeMultipart mm = new MimeMultipart(); 
+// 新建一个存放信件内容的BodyPart对象 
+BodyPart mdp = new MimeBodyPart(); 
+// 给BodyPart对象设置内容和格式/编码方式 
+mdp.setContent(content.toString(), "text/html;charset=GBK"); 
+// 这句很重要，千万不要忘了 
+mm.setSubType("related"); 
+
+mm.addBodyPart(mdp); 
+
+// add the attachments 
+for( int i=0; i<attachList.size(); i++) 
+{ 
+// 新建一个存放附件的BodyPart 
+mdp = new MimeBodyPart(); 
+DataHandler dh = new DataHandler(new ByteArrayDataSource((byte[])attachList.get(i),"application/octet-stream")); 
+mdp.setDataHandler(dh); 
+// 加上这句将作为附件发送,否则将作为信件的文本内容 
+mdp.setFileName(new Integer(i).toString() + ".jpg"); 
+mdp.setHeader("Content-ID", "IMG" + new Integer(i).toString()); 
+// 将含有附件的BodyPart加入到MimeMultipart对象中 
+mm.addBodyPart(mdp); 
+} 
+// 把mm作为消息对象的内容 
+message.setContent(mm); 
+
+message.saveChanges(); 
+javax.mail.Transport transport = session.getTransport("smtp"); 
+transport.connect(smtpHost, name, password); 
+transport.sendMessage(message, message.getAllRecipients()); 
+transport.close(); 
+} 
+
+在上述代码中需注意的是这句代码： 
+mdp.setHeader("Content-ID", "IMG" + new Integer(i).toString()); 
+它描述了附件图片的相对路径， 
+当i=1时，代码就是mdp.setHeader("Content-ID", "IMG1"); 
+
+我们的html源代码中，也就是上述的content中，需包含 
+<td align='center' valign='middle'> 
+<div align="center"> 
+<a href="http://www.test.com" target="_blank" > 
+<img src="cid:IMG1" width="60" height="45" border="0"> 
+</a> 
+</div> 
+</td> 
+就能在邮件中显示图片。 

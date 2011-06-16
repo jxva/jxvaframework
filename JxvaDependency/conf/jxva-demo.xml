@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+
+	<package name="default">
+		<action name="reload" class="com.jxva.mvc.Reload"/>
+		<action name="author" class="com.jxva.demo.action.AuthorAction"/>
+		<action name="book" class="com.jxva.demo.action.BookAction"/>
+		<action name="url" class="com.jxva.demo.action.UrlAction"/>
+	</package>
+</jxva>
+

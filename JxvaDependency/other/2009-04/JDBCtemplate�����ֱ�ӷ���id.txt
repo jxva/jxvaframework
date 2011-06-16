@@ -1,0 +1,52 @@
+在Spring框架中，使用Jdbc操作数据库，插入时返回自增id。在网上找到了解决方法。
+
+http://static.springframework.org/spring/docs/2.0.x/reference/jdbc.html
+
+这个是spring的官方文档。
+
+还有18M的DB2文档，http://publib.boulder.ibm.com/infocenter/db2luw/v8/index.jsp?topic=/com.ibm.db2.udb.doc/ad/tjvjdidn.htm
+
+我的代码
+
+ 
+
+protected int doInsertCharItem(final Charitem citem)
+    {
+        final String strSql = "insert into char_items(char_id, user_id, item_id, item_count, " +
+                 "clienttype, inuse, remaintime, validitytime) values(?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        System.out.println(strSql);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        
+        this.getPrivateJdbcTemplate().update(
+                new PreparedStatementCreator(){
+                    public java.sql.PreparedStatement createPreparedStatement(Connection conn) throws SQLException{
+                        int i = 0;
+                        java.sql.PreparedStatement ps = conn.prepareStatement(strSql, new String[] {"object_id"});
+                        
+                        ps = conn.prepareStatement(strSql, Statement.RETURN_GENERATED_KEYS);
+                        ps.setInt(++i, citem.getCharid());
+                        ps.setInt(++i, citem.getUserid());
+                        ps.setInt(++i, citem.getItemid());
+                        ps.setInt(++i, citem.getCount());
+                        ps.setInt(++i, citem.getClienttype());
+                        ps.setInt(++i, citem.getInuse());
+                        ps.setInt(++i, citem.getRemaintime());
+                        ps.setString(++i, citem.getValiditytime());
+                        
+                        System.out.println("charid = " + citem.getCharid());
+                        
+                        return ps;
+                    }
+                },
+                keyHolder);
+    
+        System.out.println("id = " + keyHolder.getKey());
+        return keyHolder.getKey().intValue();
+    }
+
+new String[] {"object_id"}和 Statement.RETURN_GENERATED_KEYS在我的实际程序中均可使用。一个是显式指定表中自增的列名，一个是系统自动获取。注意，要import java.sql.PreparedStatement;，不要同com.mysql.jdbc.PreparedStatement混淆。还有spring的一些KeyHolder相关包可以自动添加。
+
+ 
+
+btw：在Zend中使用DBtable直接就可以通过insert返回插入id，感觉PHP更方便。

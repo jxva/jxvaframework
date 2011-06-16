@@ -1,0 +1,19 @@
+16:48:38 info  :Connection Provider Factory initializing...
+16:48:38 info  :JDBC Connection Provider initializing...
+16:48:38 info  :Database Connection Success.
+16:48:42 info  :automatic remove one connection from database connection pool,overtime is 3610 ms.
+16:49:11 info  :Connection Provider Factory initializing...
+16:49:11 info  :JDBC Connection Provider initializing...
+16:49:11 info  :com.emart.model.Guide.java generate success.
+16:49:11 info  :com.emart.model.GuideCategory.java generate success.
+16:49:11 info  :com.emart.model.Special.java generate success.
+16:49:11 info  :com.emart.model.Union.java generate success.
+16:49:12 info  :com.emart.model.UnionCategory.java generate success.
+16:49:12 info  :com.emart.model.University.java generate success.
+16:49:12 info  :com.emart.dao.GuideDao.java generate success.
+16:49:12 info  :com.emart.dao.GuideCategoryDao.java generate success.
+16:49:12 info  :com.emart.dao.SpecialDao.java generate success.
+16:49:12 info  :com.emart.dao.UnionDao.java generate success.
+16:49:12 info  :com.emart.dao.UnionCategoryDao.java generate success.
+16:49:12 info  :com.emart.dao.UniversityDao.java generate success.
+16:49:12 info  :C:/Documents and Settings/Administrator/桌面/jxva-dao.properties generate success.

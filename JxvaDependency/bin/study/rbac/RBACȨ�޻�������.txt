@@ -1,0 +1,39 @@
+User
+1 test
+2 tom
+3	jack
+4	lucy
+5	lily
+
+
+Group
+    A厂 factoryA
+        营业部sale
+    B厂 factoryB
+        财务部 finance
+        人事部 human
+    C厂 factoryC
+        电脑部 computer
+        审厂部 audit
+    D厂 factoryD
+        产生部 product
+    
+Role
+    系统管理员systemadmin
+        超级管理员superadmin
+            A厂管理员afactoryadmin
+                部门管理员adepartmentadmin
+                    营业部管理员asaleadmin
+                        组长ateam
+                            普通文员aclerk
+                    电脑部acomputer                        
+                    审厂部aaudit
+                    产生部aproduct
+                    财务部afinance
+            B厂管理员bfactoryadmin
+                部门管理员bdepartmentadmin
+                    营业部管理员bsaleadmin
+                    电脑部bcomputer                        
+                    审厂部baudit
+                    产生部bproduct
+                    财务部bfinance

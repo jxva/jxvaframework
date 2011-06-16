@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/baseline.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/c3p0-0.9.1.2.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/commons-dbcp-1.2.1.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/commons-pool-1.2.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/db2jcc.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/db2jcc_license_cu.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/derbyclient.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/derbytools.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/ejb-api-3.0.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/el-api.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/jms-1.1.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/junit.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/oracle.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/proxool-0.9.1.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/proxool-cglib.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/sqljdbc.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/swt-3.4.1.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/swt-grouplayout.jar"/>
+	<classpathentry kind="lib" path="ext/mpxj.jar"/>
+	<classpathentry kind="lib" path="ext/poi-3.2-FINAL-20081019.jar"/>
+	<classpathentry kind="lib" path="ext/bonecp-0.6.0.jar"/>
+	<classpathentry kind="lib" path="ext/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="ext/google-collect-1.0-rc5.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/mvel2_2.0.17_v20100511.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/workspace/JxvaDependency/lib/mail-1.4.3.jar"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>

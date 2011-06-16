@@ -1,0 +1,72 @@
+Java图像变换类 - AffineTransform
+2
+推荐
+ AffineTransform是J2SE中非常重要的专门处理2D图像仿射变换的类，尤其在游戏工具编写中经常会用到。
+AffineTransform.getRotateInstance(double theta)  返回表示旋转变换的变换。以（0,0）为中心，旋转theta(角度制)顺时针方向
+AffineTransform.getRotateInstance(double theta, double x, double y) 返回绕锚点旋转坐标的变换。以（x，y）为中心，旋转theta(角度制)顺时针方向
+AffineTransform.getScaleInstance(double sx, double sy) 返回表示缩放变换的变换。sx,sy为width,height倍数
+AffineTransform.getTranslateInstance(double tx, double ty)   返回表示平移变换的变换。
+AffineTransform.getShearInstance(double shx, double shy)   返回表示剪切变换的变换。相当于一个横向剪切与一个纵向剪切的复合。
+AffineTransform.concatenate(AffineTransform Tx)  以最常用的方式将 AffineTransform Tx 连接到此 AffineTransform Cx，以提供由 Tx 映射到以前用户空间的新
+用户空间。连接前后两种变换的效果。
+//该方法实现了倒影效果
+private AffineTransform setToMirroredTransform() {
+  AffineTransform saveTx = g2.getTransform();
+  af.setTransform(saveTx);
+  af.scale(1, -1);
+  g2.setTransform(af);
+  return saveTx;
+ }
+
+        g2.drawString("Allen is good", 100, 80);
+        AffineTransform saveTx = setToMirroredTransform();
+        g2.drawString("Allen is good", 100, -80);
+        g2.setTransform(saveTx);
+        
+==================================================================        
+AffineTransform 类表示 2D 仿射变换，它执行从 2D 坐标到其他 2D 坐标的线性映射，
+保留了线的“直线性”和“平行性”。可以使用一系列
+平移 (translation)、缩放 (scale)、翻转 (flip)、旋转 (rotation) 和错切 (shear) 来构造仿射变换。
+ public Point2D inverseTransform(Point2D ptSrc, Point2D ptDst) 
+ 逆向变换指定的 ptSrc 并将结果存储在 ptDst 中。如果 ptDst 为 null，
+ 则分配一个新的 Point2D 对象，然后将变换的结果存储在此对象中。无论是哪种情况，
+ 为方便起见，都将返回包含变换点的 ptDst。如果 ptSrc 和 ptDst 是同一个对象
+ ，则将使用变换点正确地改写输入点
+
+==================================================================
+
+        很多人都研究过GL的Animation编辑器，但是对其XML数据文件中Sprite的m00 m01 m02 m10 m11 m12我想并不是每个人都能弄的明白，其实他们是Java的图像变换类AffineTransform的6个参数。
+ 
+        AffineTransform是J2SE中非常重要的专门处理2D图像仿射变换的类，尤其在游戏工具编写中经常会用到。该类的构造函数有6个参数m00 m10 m01 m11 m02 m12，会构造一个矩阵
+[m00 m01 m02]
+[m10 m11 m12]
+[  0     0     1 ]
+注意这6个参数的顺序，CoCoMo曾经因为搞错了参数的顺序而得出了错误的结果，最郁闷的是还被jedi忽悠说曾经有种Identity矩阵不是以
+[1  0  0]
+[0  1  0]
+[0  0  1]
+格式存储的，误导我半天没有找到问题所在。
+ 
+当构建出了该矩阵后，则平移时左乘一个平移矩阵
+[1  0  tx]
+[0  1  ty]
+[0  0   1]
+反转X时左乘一个缩放矩阵
+[-1   0   0]
+[ 0   1   0]
+[ 0   0   1]
+反转Y时左乘一个缩放矩阵
+[1   0   0]
+[0  -1   0]
+[0   0   1]
+旋转时左乘一个旋转矩阵
+[cos(theta)  -sin(theta)  0]
+[sin(theta)   cos(theta)  0]
+[   0                  0        1]
+然后将该矩阵setTransform到Graphics2D里即可画图了。
+ 
+要想得到变换后的数据，调用getMatrix得到一个double数组matrix，matrix[4]即X轴偏移量，matrix[5]即Y轴偏移量。假如matrix[0] < 0即反转了X，matrix[3] < 0即反转了Y。
+double degree = Math.toDegrees(Math.asin(matrix[1]));
+if(degree < 0)
+      degree += 360;
+即可得到旋转的角度。

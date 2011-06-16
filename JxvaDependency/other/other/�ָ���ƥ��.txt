@@ -1,0 +1,221 @@
+栈通常用于解析某种类型的文本串。通常，文本串是用计算机语言写的代码行，而解析它们的程序就是编译器。
+
+为了解释清楚，下面看一个检查用户输入的一行文本中分隔符的程序。文本不一定是实际的Java代码，但它需要使用和Java同样的分隔符。分隔符包括大括号“｛”和“｝”，中括号“〔”和“〕”和小括号“（”和“）”。每个左分隔符需要和右分隔符匹配；这就是说，每个“｛”后面要有“｝”来匹配，依次类推。同时，在字符串中后出现的左分隔符应该比早出现的左分隔符先完成匹配。
+
+栈中的左分隔符
+
+分隔符匹配程序从字符串中不断地读取字符，每次读取一个字符。若发现它是左分隔符，将它压入栈中。当从输入中读到一个右分隔符时，弹出栈顶的左分隔符，并且查看它是否和右分隔符相匹配。如果它们不匹配，则程序报错。如果栈中没有左分隔符和右分隔符匹配，或者一直存在着没有被匹配的分配符，程序也报错。分隔符没有被匹配，表现为把所有的字符读入之后，栈中仍留有分隔符。
+
+看看对下面这个正确的字符串，栈的变化过程：
+
+a{b(c[d]e)f}
+
+每次从字符串中读取一个字符后栈的状况。表中第二列显示的是栈中数据项，左边是栈底，右边是栈顶。
+
+随着字符串的读取，读到左分隔符，就被压入栈。然而每读到一个右分隔符，就和从栈顶弹出的左分隔符进行匹配。如果它们匹配成功，则一切正常进行。非分隔符的字符不插入栈中，只需略过它们。
+
+这个方法的可行性在于，最后出现的左边分隔符需要最先匹配。这个规律符合栈的后进先出的特点。
+
+下面是Brackets.java代码：
+
+package 栈和队列;
+
+import java.io.*;
+
+class StackX1{
+
+       private int maxSize;
+
+       private char[] stackArray;
+
+       private int top;
+
+       //....................................
+
+       public StackX1(int s){
+
+              maxSize=s;
+
+              stackArray=new char[maxSize];
+
+              top=-1;
+
+       }
+
+       //.........................................
+
+       public void push(char j){
+
+              stackArray[++top]=j;
+
+       }
+
+       //.......................................
+
+       public char pop(){
+
+              return stackArray[top--];
+
+       }
+
+       //.......................................
+
+       public char peek(){
+
+              return stackArray[top];
+
+       }
+
+       //........................................
+
+       public boolean isEmpty(){
+
+              return (top==-1);
+
+       }
+
+}
+
+//////////////////////////////////////////////
+
+class BracketChecker{
+
+       private String input;
+
+       //........................................
+
+       public BracketChecker(String in){
+
+              input=in;
+
+       }
+
+       //........................................
+
+       public void check(){
+
+              int stackSize=input.length();
+
+              StackX1 theStack=new StackX1(stackSize);
+
+              for(int j=0;j<input.length();j++){
+
+                     char ch=input.charAt(j);
+
+                     switch(ch){
+
+                     case '{':
+
+                     case '[':
+
+                     case '(':
+
+                            theStack.push(ch);
+
+                            break;
+
+                     case '}':
+
+                     case ']':
+
+                     case ')':
+
+                            if(!theStack.isEmpty()){
+
+                                   char chx=theStack.pop();
+
+                                   if((ch=='}' && chx!='{') || (ch==']' &&chx!='[') || (ch==')' && chx !=')'))
+
+                                          System.out.println("Char: "+ch+" at "+j);
+
+                            }else
+
+                                   System.out.println("Error: "+ch+" at "+j);
+
+                            break;
+
+                     default:
+
+                            break;
+
+                     }
+
+              }
+
+              if(!theStack.isEmpty()){
+
+                     System.out.println("Error: missing right delimiter");
+
+              }
+
+       }
+
+}
+
+////////////////////////////////////////////////
+
+public class BracketsApp {
+
+       /**
+
+       * @param args
+
+       * @throws IOException
+
+       */
+
+       public static void main(String[] args) throws IOException {
+
+              // TODO Auto-generated method stub
+
+              String input;
+
+              while(true){
+
+                     System.out.print("Enter string containing delimiters: ");
+
+                     System.out.flush();
+
+                     input=getString();
+
+                     if(input.equals(""))
+
+                            break;
+
+                     BracketChecker theChecker=new BracketChecker(input);
+
+                     theChecker.check();
+
+              }
+
+       }
+
+       //..................................................
+
+       public static String getString() throws IOException{
+
+              InputStreamReader isr=new InputStreamReader(System.in);
+
+              BufferedReader br=new BufferedReader(isr);
+
+              String s=br.readLine();
+
+              return s;
+
+       }
+
+}
+
+Check()例程从reverse.java中调用了StackX类。请注意重用这个类非常容易，只需要在一个地方添加代码就可以。它是面向对象编程的优点之一。
+
+BracketApp类中的main()例程从用户那里不间断地读取文本行，把文本字符串作为参数创建一个BracketChecker对象，然后调用这个BracketChecker对象的check()方法。如果出现任何错误，check()方法将显示出来，否则分隔符的语法就是正确的。
+
+Check()方法能报告发现不匹配分隔符的位置。
+
+栈是一个概念上的辅助工具
+
+由上可见，在brackets.java程序中使用栈是多么方便。同样也可以利用普通数组来完成栈的操作，但是那样就不得不自己老惦记着最后添加的字符的下标值，和某些记账的问题一样。栈在抽象概念上更便于使用。栈通过提供限定性的访问方法push()和pop()，使程序易读且不易出错。
+
+栈的效率
+
+StackX类中实现的栈，数据项入栈和出栈的时间复杂度都为常数O(1)。这也就是说，栈操作所耗的时间不依赖于栈中数据项的个数，因此操作时间很短。栈不需要比较和移动操作。

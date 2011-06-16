@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+	<display-name>Jxva Framework</display-name>
+
+	<filter>
+		<filter-name>CoreFilter</filter-name>
+		<filter-class>com.jxva.mvc.CoreFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CoreFilter</filter-name>
+		<url-pattern>*.jv</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CoreFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+    	<servlet-name>Controller</servlet-name>
+    	<servlet-class>com.jxva.mvc.Controller</servlet-class>
+  	</servlet>
+  	<servlet-mapping>
+    	<servlet-name>Controller</servlet-name>
+    	<url-pattern>*.jv</url-pattern>
+  	</servlet-mapping>
+
+  	
+ 
+  
+     <jsp-config>
+        <taglib>
+			<taglib-uri>http://www.jxva.com/tag</taglib-uri>
+			<taglib-location>/WEB-INF/classes/jxva-tag.tld</taglib-location>
+		</taglib>
+    </jsp-config>
+</web-app>

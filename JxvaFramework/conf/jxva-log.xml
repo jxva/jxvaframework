@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+	<!--level:fatal,warn,error,info,debug,trace-->
+
+	<console enable="true">
+		<level>info</level>
+	</console>
+	
+	<file enable="true">
+		<level>info</level>
+		<save-path>default</save-path>
+	</file>
+	
+	<database enable="true">
+		<level>info</level>
+		<table-name>tbl_system_log</table-name>
+	</database>
+	
+</jxva>

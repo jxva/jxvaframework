@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+	<mail-smtp name="ztemc">
+		<auth>true</auth>
+		<from>hi@jxva.com</from>
+		<host>mail.jxva.com</host>
+		<username>hi@jxva.com</username>
+		<password>lovejxva</password>
+		<timeout>25000</timeout>
+	</mail-smtp>
+</jxva>

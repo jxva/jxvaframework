@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+
+<project name="JxvaFramework" default="ejbjar" basedir=".">
+
+	<property name="common.dir" value="../JxvaDependency" />
+	<property name="app.name" value="com.jxva.framework.core_1.0.0" />
+	<property name="app.dir" value="${basedir}" />
+	<property name="src.dir" value="${app.dir}/src" />	
+	<property name="build.bin.dir" value="${app.dir}/WebRoot/WEB-INF/classes" />
+	<property name="build.jar.dir" value="${app.dir}/build/jar" />
+	<property name="build.war.dir" value="${app.dir}/build/war" />
+	<property name="build.src.dir" value="${app.dir}/build/src" />
+	<tstamp>
+		<format property="subversion" pattern="yyyyMMdd"/>
+	</tstamp>
+	<path id="build.classpath">
+		<!--
+		<fileset dir="${webinfo.dir}/lib">
+			<include name="*.jar" />
+		</fileset>
+		-->
+		<fileset dir="${common.dir}/lib">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${build.bin.dir}" />
+	</path>
+	
+	<target name="clean">
+		<!--
+		<delete dir="${build.bin.dir}" />
+		<delete dir="${build.jar.dir}" />
+		<delete dir="${build.war.dir}" />
+		-->
+	</target>
+	
+	<target name="prepare" depends="clean">
+		<!--
+		<mkdir dir="${build.bin.dir}" />
+		<mkdir dir="${build.jar.dir}" />
+		<mkdir dir="${build.war.dir}" />
+		-->
+	</target>
+
+	<target name="compile" depends="prepare">
+		<javac encoding="utf-8"  srcdir="${src.dir}" destdir="${build.bin.dir}" debug="on" deprecation="on" optimize="on" includes="com/**">
+			<compilerarg value="-Xlint:unchecked"/>
+			<classpath refid="build.classpath" />
+		</javac>
+	</target>
+	<target name="compile-ejbjar" depends="compile">
+		
+	</target>
+
+	<target name="srcjar">
+		<tstamp />
+		<delete file="${build.src.dir}/${app.name}_v${subversion}_src.jar" />
+		<jar destfile="${build.src.dir}/${app.name}_v${subversion}_src.jar">
+			<fileset dir="${app.dir}">
+				<exclude name="build/bin/*/**"/>
+				<exclude name="build/jar/*/**"/>
+				<exclude name="build/logs/*/**"/>
+				<exclude name="build/src/*/**"/>
+				<exclude name="build/war/*/**"/>
+				<exclude name="lib/*.jar"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="ejbjar">
+		<tstamp />
+		<mkdir dir="${build.bin.dir}/META-INF/tld" />
+		<copy todir="${build.bin.dir}/META-INF/tld">
+			<fileset dir="${app.dir}/src">
+				<include name="jxva-tag.tld"/>
+			</fileset>
+		</copy>
+		<delete file="${build.jar.dir}/${app.name}_v${subversion}.jar" />
+		<jar destfile="${build.jar.dir}/${app.name}_v${subversion}.jar">
+			<fileset dir="${build.bin.dir}">
+				<include name="com/**"/>
+				<include name="META-INF/**"/>
+				<include name="jxva-log.properties"/>
+				<exclude name="test/**"/>
+			</fileset>
+		</jar>
+
+		
+
+		
+		<!--delete>
+			 <fileset dir="../SSO/WebRoot/WEB-INF/lib/" includes="com.jxva.framework.core_v1.0.0_*.jar"/>
+		</delete>
+		<copy file="${build.jar.dir}/${app.name}_${subversion}.jar" todir="../SSO/WebRoot/WEB-INF/lib" />
+		-->
+		<!--delete>
+					 <fileset dir="../ztemusic/WebRoot/WEB-INF/lib/" includes="com.jxva.framework.core_v1.0.0_*.jar"/>
+				</delete>
+				<copy file="${build.jar.dir}/${app.name}_${subversion}.jar" todir="../ztemusic/WebRoot/WEB-INF/lib" /-->
+				
+		
+		<!--
+		
+		<delete>
+			 <fileset dir="../JxvaTest/WebRoot/WEB-INF/lib/" includes="com.jxva.framework.core_v1.0.0_*.jar"/>
+		</delete>
+		<copy file="${build.jar.dir}/${app.name}_${subversion}.jar" todir="../JxvaTest/WebRoot/WEB-INF/lib" />
+		
+		<delete>
+			 <fileset dir="../Jxva/WebRoot/WEB-INF/lib/" includes="com.jxva.framework.core_v1.0.0_*.jar"/>
+		</delete>
+		<copy file="${build.jar.dir}/${app.name}_${subversion}.jar" todir="../Jxva/WebRoot/WEB-INF/lib" />
+		
+		-->
+		
+	</target>
+</project>

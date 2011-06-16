@@ -1,0 +1,336 @@
+December 12th, 2008 at 11:28 am  1
+
+
+1.从父页面访问iframe中的内容
+  $("#ifrId").contents().find("#test").css('color','red'); 
+  等同于
+  document.getElementById('ifrId').contentWindow.document.getElementById('test').style.color='red'
+  $(window.frames["ifrName"].document).find("#test").css('color','red'); 
+
+2.从iframe页中访问父页面中的内容
+  $(top.window.document).find("#test").css('color','red'); 
+  top.$("#test").css('color','red'); 
+
+3.避免在iframe页中重复加载jQuery.js文件引用
+  var $top = top.$;
+  $top("#test").css('color','red'); //这里找到的#test元素实际上是父页面中的
+  $top(document.getElementById('test')).css('color','red'); //操作本iframe中的元素
+
+
+
+
+
+
+2.跨框架的执行？如何写呢？
+jQuery("div.test", window.frames[0].document );//查询frames[0]中的内容
+
+parent.jQuery("#div1",document);//在子页面使用父页面的的jQuery操作子页面内容
+
+
+jquery 应用于框架时在ie中出错
+
+jquery 应用于框架时在ie中出错，附件中为出错代码。
+
+在ff中使用正常！
+
+
+
+ 附件: 您所在的用户组无法下载或查看附件
+顶部
+shawphy
+版主
+Rank: 7Rank: 7Rank: 7
+
+
+
+UID 4248
+精华 1
+积分 8
+帖子 1106
+阅读权限 100
+注册 2007-11-25
+状态 离线
+	
+#2
+使用道具  
+发表于 2008-5-29 15:11  资料  个人空间  主页 短消息  加为好友 
+看看这个能不能解决你的问题
+
+[Copy to clipboard] [ - ]
+CODE:
+Q4，在框架页中，如何操作父窗口的对象
+A，引用UPC的方法
+
+没找到很好的方法
+只好用DOM方法与jquery方法结合的方式实现了
+
+1.在父窗口中操作 选中IFRAME中的所有单选钮
+$(window.frames["iframe1"].document).find("input[type='radio']").attr("checked","true");
+
+2.在IFRAME中操作 选中父窗口中的所有单选钮
+$(window.parent.document).find("input[type='radio']").attr("checked","true");
+
+iframe框架的：<iframe src="test.html" id="iframe1" width="700" height="300" frameborder="0" scrolling="auto"></iframe>
+
+IE7中测试通过 回去你自己试试吧
+
+实现的原理其实很简单 就是用到了$(DOM对象)可以转换成jquery对象
+==================================================
+
+不过我的方法是
+window.parent.jQuery("input[name=validate]").val("<%=Session("GetCode")%>");
+这段是来自我博客的自动填写验证码的，有兴趣可分析下我的FOOTER里的那个框架。
+其实本质上和UPC的方法是一样的。大家可以借鉴参考
+
+
+
+
+
+
+jQuery 1.2 API 中文版
+顶部
+javy_liu
+新手上路
+Rank: 1
+
+
+
+UID 8705
+精华 0
+积分 0
+帖子 22
+阅读权限 10
+注册 2008-5-29
+状态 离线
+	
+#3
+使用道具  
+发表于 2008-5-30 11:05  资料  个人空间  短消息  加为好友 
+谢谢回复，但还是没有解决
+
+index.htm:
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<FRAMESET rows="64,*" cols="*" border="2px" bordercolor="#000000">
+<FRAME SRC="top1.htm" name="top" scrolling="no" border="2px" />
+<FRAMESET rows="2" COLS="23%,*" >
+<FRAME SRC="left.htm" name="left" />
+<FRAME src="right.htm"  name="right"/>
+</FRAMESET>
+</FRAMESET>
+</html>
+
+top.htm:
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" c />
+<title>Untitled Document</title>
+<script language="javascript" src="jquery.js"></script>
+<script language="javascript" type="text/javascript">
+
+        var left=window.parent.left.document;
+        var right=window.parent.right;
+        $(document).ready(function(){
+               
+                $("#btSearch").click(function(){
+                        
+                        var right_body=$(right.document.body);
+                        var key=$("#tbsearch").val();
+                        right_body.empty();
+                        
+                        var add_content=$(left.body).find("a");        
+                        $(right_body).append(add_content);       //在ie6.0中一执行到这条语句时就报错，在ff中可以很顺利运行。说是参数错误，有没有达人知道是什么原因？        
+                        
+                        $("a",right.document.body).css({"display":"block" })        
+                        
+                });
+               
+               
+        });
+        
+        
+        
+</script>
+</head>
+
+<body>
+<input type="button" name="Submit" value="search" id="btSearch" />
+</body>
+</html>
+
+left.htm:
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" c />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<p><a href="test1.html">test</a></p>
+<p>    <a href="text2.html">test</a></p>
+<p>
+<a href="text3.html">test</a></p>
+<p>
+  <a href="test4.html">test</a>
+</p>
+</body>
+</html>
+
+
+right.htm:
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" c />
+<title>Untitled Document</title>
+</head>
+
+<body>
+</body>
+</html>
+
+[ 本帖最后由 javy_liu 于 2008-5-30 11:07 编辑 ]
+
+顶部
+shawphy
+版主
+Rank: 7Rank: 7Rank: 7
+
+
+
+UID 4248
+精华 1
+积分 8
+帖子 1106
+阅读权限 100
+注册 2007-11-25
+状态 离线
+	
+#4
+使用道具  
+发表于 2008-5-30 18:34  资料  个人空间  主页 短消息  加为好友 
+其实IE中js在框架上的应用还是一片混乱的……
+跨框架append之类的会让你完全不知道这个变量是在哪的……
+所以只好用个中间变量
+
+用了个赖皮的方法：
+
+left.html里增加一个临时DIV
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" c />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<p><a href="#">test</a></p>
+<p>    <a href="#">test</a></p>
+<p>
+<a href="#">test</a></p>
+<p>
+  <a href="#">test</a>
+</p>
+<div id="tmp"></div>
+</body>
+</html>
+
+然后在top里，
+                        var right_body=$(right.document.body);
+                        var key=$("#tbsearch").val();
+                        right_body.empty();
+
+                        var left_tmp=$("#tmp",left.body);
+                        $(left.body).find("a").appendTo(left_tmp);        
+                        $(right_body).append(left_tmp.html());
+                        left_tmp.empty();
+                        
+                        $("a",right.document.body).css({"display":"block" })
+
+[ 本帖最后由 shawphy 于 2008-5-30 18:46 编辑 ]
+
+
+==================================
+
+基于JQuery框架的AJAX
+2007-11-22 21:23
+正好项目中准备使用thickbox，于是干脆抛弃prototype.js，看起jquery.js了。JQuery确实不错，体积比Prototype 小了许多，而且使用起来更方便更灵活。有人说Prototype像JAVA，正统；而JQuery像Ruby，灵活，更趋于OOP。
+
+小试了下AJAX，感觉比prototype简洁多了，在JQuery中，AJAX有三种实现方式：$.ajax(),$.post,$.get()。
+
+XHTML(主要):
+<div id="result" style="background:orange;border:1px solid red;width:300px;height:400px;"></div>
+<form id="formtest" action="" method="post">
+<p><span>输入姓名:</span><input type="text" name="username" id="input1" /></p>
+<p><span>输入年龄:</span><input type="text" name="age" id="input2" /></p>
+<p><span>输入性别:</span><input type="text" name="sex" id="input3" /></p>
+<p><span>输入工作:</span><input type="text" name="job" id="input4" /></p>
+</form>
+<button id="send_ajax">提交</button>
+<button id="test_post">POST提交</button>
+<button id="test_get">GET提交</button>
+
+
+JS:
+1、引入jquery框架：
+<script   type="text/javascript" src="../js/jquery.js"></script>
+
+2、构建AJAX，JQUERY的好处是不需要在XHTML中使用JS代码来触发事件了，可以直接封装在JS文件中：
+<script type="text/javascript">
+//$.ajax()方式
+$(document).ready(function (){
+$('#send_ajax').click(function (){ //直接把onclick事件写在了JS中，而不需要混在XHTML中了
+      var params=$('input').serialize(); //序列化表单的值，与prototype中的form.serialize()相同
+      $.ajax({
+            url ：'ajax_test.php',  //后台处理程序
+            type:'post', //数据发送方式
+            dataType:'json', //接受数据格式
+            data:params,   //要传递的数据
+            success:update_page  //回传函数(这里是函数名)
+            });
+       });
+});
+function update_page (json) { //回传函数实体，参数为XMLhttpRequest.responseText
+   var str="姓名:"+json.username+"<br />";
+   str+="年龄:"+json.age+"<br />";
+   str+="性别:"+json.sex+"<br />";
+   str+="工作:"+json.job;
+   $("#result").html(str);
+}
+//$.post()方式：
+$(function (){ //$(document).ready(function (){ 的简写
+   $('#test_post').click(function (){
+            $.post('ajax_test.php',
+            {username:$('#input1').val(),age:$('#input2').val(),sex:$('#input3').val(),job:$('#input4').val()},
+            function (data){ //回传函数
+            var myjson='';
+            eval('myjson='+data+';');
+            $('#result').html("姓名:"+myjson.username+"<br />工作:"+myjson['job']);
+            });
+   });
+});
+//$.get()方式：
+$(function (){
+      $('#test_get').click(function (){
+                  $.get('ajax_test.php',
+                  {username:$("#input1").val(),age:$("#input2").val(),sex:$("#input3").val(),job:$("#input4").val()},
+                  function   (data) {
+                        var myjson='';
+                        eval("myjson="+data+";");
+                        $("#result").html(myjson.job);
+                  });
+          });
+});
+</script>
+
+PHP代码：
+<?php
+$arr=$_POST; //若以$.get()方式发送数据，则要改成$_GET.或者干脆:$_REQUEST
+$myjson=json_encode($arr);
+echo $myjson;
+?>

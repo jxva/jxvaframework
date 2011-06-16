@@ -1,0 +1,157 @@
+最近在在翻看java的Garbage Collection，即大名鼎鼎的垃圾收集器GC的相关资料，整理了一下头绪，和朋友们共勉之。
+
+Java的GC机制大名远扬，它大幅提高了程序员开发效率，省去了在c#中要显式的释放每一块内存的麻烦。我们常听到的“内存泄漏”实际上就是指无用的内存没有被及时回收。例如你声明了一个变量，而该变量所在的主进程需要运行很长时间，那么就形成了局部上的“内存泄漏”。“内存泄漏”是相对来说的，即在内存资源紧张的时候，无用的内存没有被回收，系统就会面临内存泄漏的危险。
+
+那现在说下什么样的情况会被GC回收，说简单点就是通路断掉的内存会被回收。可以看下面例子：
+view plaincopy to clipboardprint?
+
+   1. Object o1 = new Object();   
+   2. Object o2 = new Object();   
+   3. o2 = o1;  
+
+Object o1 = new Object();
+Object o2 = new Object();
+o2 = o1;
+
+o2=o1指明了这2个变量都指向了同一个对象，即使用了同一块内存区域，那么我们就说原o2申明的Object对象的那块内存会被GC回收，因为没有通路和它连通。
+
+GC回收对程序员来说是透明的，要及时释放内存，最稳妥的方法就是在对象被使用完毕后，立即为该对象赋值为null，但是我们不知道什么时候这些无用资源会被回收，有什么办法可以显示执行吗？有的，就是显示调用System.gc();（该方法不保证立即会执行，因为不同的JVM使用不用算法来管理 GC）。要让gc()达到立竿见影的效果，可以选择使用jdk1.2以来引入的4种对象引用类型上，废话不多说，看程序来说话：
+view plaincopy to clipboardprint?
+
+   1. import java.lang.ref.PhantomReference;   
+   2. import java.lang.ref.ReferenceQueue;   
+   3. import java.lang.ref.SoftReference;   
+   4. import java.lang.ref.WeakReference;   
+   5.   
+   6. class MyObject {   
+   7.     private String id;   
+   8.   
+   9.     public MyObject(String id) {   
+  10.         this.id = id;   
+  11.      }   
+  12.   
+  13.     public String toString() {   
+  14.         return id;   
+  15.      }   
+  16.   
+  17.     public void finalize() {   
+  18.          System.out.println("回收对象：" + id);   
+  19.      }   
+  20. }   
+  21.   
+  22. public class TestReferences {   
+  23.     public static void main(String[] args) {   
+  24.         // 创建强引用   
+  25.          MyObject ref = new MyObject("Hard");   
+  26.          System.out.println(ref);   
+  27.          ref = null;   
+  28.          System.gc();   
+  29.          System.out.println(ref);   
+  30.            
+  31.   
+  32.         // 创建软引用   
+  33.          SoftReference<MYOBJECT></MYOBJECT> softRef = new SoftReference<MYOBJECT></MYOBJECT>(   
+  34.                 new MyObject("Soft"));   
+  35.          System.out.println(softRef.get());   
+  36.          System.gc();   
+  37.          System.out.println(softRef.get());   
+  38.   
+  39.         // 创建弱引用   
+  40.          WeakReference<MYOBJECT></MYOBJECT> weakRef = new WeakReference<MYOBJECT></MYOBJECT>(   
+  41.                 new MyObject("Weak"));   
+  42.          System.out.println("before gc —— " + weakRef.get());   
+  43.          System.gc();   
+  44.          System.out.println("after gc —— " + weakRef.get());   
+  45.   
+  46.         // 创建虚引用   
+  47.          ReferenceQueue<MYOBJECT></MYOBJECT> rq = new ReferenceQueue<MYOBJECT></MYOBJECT>();   
+  48.          PhantomReference<MYOBJECT></MYOBJECT> phantomRef = new PhantomReference<MYOBJECT></MYOBJECT>(   
+  49.                 new MyObject("Phantom"), rq);   
+  50.          System.out.println("before gc —— " + phantomRef.get());   
+  51.          System.gc();   
+  52.          System.out.println("after gc —— " + phantomRef.get());   
+  53.      }   
+  54. }  
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+
+class MyObject {
+ private String id;
+
+ public MyObject(String id) {
+  this.id = id;
+ }
+
+ public String toString() {
+  return id;
+ }
+
+ public void finalize() {
+  System.out.println("回收对象：" + id);
+ }
+}
+
+public class TestReferences {
+ public static void main(String[] args) {
+  // 创建强引用
+  MyObject ref = new MyObject("Hard");
+  System.out.println(ref);
+  ref = null;
+  System.gc();
+  System.out.println(ref);
+  
+
+  // 创建软引用
+  SoftReference softRef = new SoftReference(
+    new MyObject("Soft"));
+  System.out.println(softRef.get());
+  System.gc();
+  System.out.println(softRef.get());
+
+  // 创建弱引用
+  WeakReference weakRef = new WeakReference(
+    new MyObject("Weak"));
+  System.out.println("before gc —— " + weakRef.get());
+  System.gc();
+  System.out.println("after gc —— " + weakRef.get());
+
+  // 创建虚引用
+  ReferenceQueue rq = new ReferenceQueue();
+  PhantomReference phantomRef = new PhantomReference(
+    new MyObject("Phantom"), rq);
+  System.out.println("before gc —— " + phantomRef.get());
+  System.gc();
+  System.out.println("after gc —— " + phantomRef.get());
+ }
+}
+
+输出如下：
+
+Hard
+null
+Soft
+Soft
+回收对象：Hard
+before gc —— Weak
+after gc —— null
+回收对象：Weak
+before gc —— null
+after gc —— null
+回收对象：Phantom
+
+以上我们创建了4种引用，依次是：强引用、软引用、弱引用、虚引用。
+
+强引用即我们普通使用的申明方式，对于该引用，只有显示的赋值为null，gc才会视为回收对象。
+
+软引用（SoftReference）是只有内存不足时，gc才会将它视为回收对象。
+
+弱引用（WeakReference）是无论当前内存是否满足，gc都会去回收它。
+
+虚引用（PahntomReference）实际是可以理解成“子虚乌有”的引用，目的仅仅是结合引用关联队列（ReferenceQueue），实现对对象引用关系的跟踪。
+
+在 MyObject类中finalize方法中，我们让它在被回收时打印一句话出来，从输出结果来看，我们可以很容易的理解GC这4种对象引用的不同处理方式。从中我们可以得到结论，System.gc()可以对弱引用和虚引用达到立竿见影的效果。
+
+好了以上一点小建议、想法，希望能对你有所帮助！

@@ -1,0 +1,291 @@
+09:07:01 info  :Connection Provider Factory initializing...
+09:07:01 info  :JDBC Connection Provider initializing...
+09:07:01 info  :Database Connection Success.
+09:07:04 info  :automatic remove one connection from database connection pool,overtime is 3609 ms.
+09:07:11 info  :Connection Provider Factory initializing...
+09:07:11 info  :JDBC Connection Provider initializing...
+09:07:11 info  :com.emart.model.Finance.java generate success.
+09:07:11 info  :com.emart.model.Friend.java generate success.
+09:07:12 info  :com.emart.model.Group.java generate success.
+09:07:12 info  :com.emart.model.Guide.java generate success.
+09:07:12 info  :com.emart.model.Job.java generate success.
+09:07:12 info  :com.emart.model.LoginLog.java generate success.
+09:07:12 info  :com.emart.model.Manager.java generate success.
+09:07:12 info  :com.emart.model.Menu.java generate success.
+09:07:12 info  :com.emart.model.Message.java generate success.
+09:07:12 info  :com.emart.model.News.java generate success.
+09:07:12 info  :com.emart.model.NewsCategory.java generate success.
+09:07:12 info  :com.emart.model.Order.java generate success.
+09:07:12 info  :com.emart.model.OrderMap.java generate success.
+09:07:12 info  :com.emart.model.Point.java generate success.
+09:07:12 info  :com.emart.model.Privilege.java generate success.
+09:07:12 info  :com.emart.model.Product.java generate success.
+09:07:12 info  :com.emart.model.ProductAsk.java generate success.
+09:07:12 info  :com.emart.model.ProductCategory.java generate success.
+09:07:12 info  :com.emart.model.ProductComment.java generate success.
+09:07:12 info  :com.emart.model.ProductPicture.java generate success.
+09:07:12 info  :com.emart.model.ProductProperty.java generate success.
+09:07:12 info  :com.emart.model.ProductType.java generate success.
+09:07:12 info  :com.emart.model.PropertyValue.java generate success.
+09:07:12 info  :com.emart.model.Region.java generate success.
+09:07:12 info  :com.emart.model.Role.java generate success.
+09:07:12 info  :com.emart.model.Shelf.java generate success.
+09:07:12 info  :com.emart.model.Url.java generate success.
+09:07:12 info  :com.emart.model.User.java generate success.
+09:07:12 info  :com.emart.model.UserDetail.java generate success.
+09:07:12 info  :com.emart.model.UserType.java generate success.
+09:07:12 info  :com.emart.model.UrlPrivilege.java generate success.
+09:07:12 info  :com.emart.dao.FinanceDao.java generate success.
+09:07:12 info  :com.emart.dao.FriendDao.java generate success.
+09:07:12 info  :com.emart.dao.GroupDao.java generate success.
+09:07:12 info  :com.emart.dao.GuideDao.java generate success.
+09:07:12 info  :com.emart.dao.JobDao.java generate success.
+09:07:12 info  :com.emart.dao.LoginLogDao.java generate success.
+09:07:12 info  :com.emart.dao.ManagerDao.java generate success.
+09:07:12 info  :com.emart.dao.MenuDao.java generate success.
+09:07:12 info  :com.emart.dao.MessageDao.java generate success.
+09:07:12 info  :com.emart.dao.NewsDao.java generate success.
+09:07:12 info  :com.emart.dao.NewsCategoryDao.java generate success.
+09:07:12 info  :com.emart.dao.OrderDao.java generate success.
+09:07:12 info  :com.emart.dao.OrderMapDao.java generate success.
+09:07:12 info  :com.emart.dao.PointDao.java generate success.
+09:07:12 info  :com.emart.dao.PrivilegeDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductAskDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductCategoryDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductCommentDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductPictureDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductPropertyDao.java generate success.
+09:07:12 info  :com.emart.dao.ProductTypeDao.java generate success.
+09:07:12 info  :com.emart.dao.PropertyValueDao.java generate success.
+09:07:12 info  :com.emart.dao.RegionDao.java generate success.
+09:07:12 info  :com.emart.dao.RoleDao.java generate success.
+09:07:12 info  :com.emart.dao.ShelfDao.java generate success.
+09:07:12 info  :com.emart.dao.UrlDao.java generate success.
+09:07:12 info  :com.emart.dao.UserDao.java generate success.
+09:07:12 info  :com.emart.dao.UserDetailDao.java generate success.
+09:07:12 info  :com.emart.dao.UserTypeDao.java generate success.
+09:07:12 info  :com.emart.dao.UrlPrivilegeDao.java generate success.
+09:07:12 info  :com.emart.action.FinanceAction.java generate success.
+09:07:12 info  :com.emart.action.FriendAction.java generate success.
+09:07:12 info  :com.emart.action.GroupAction.java generate success.
+09:07:12 info  :com.emart.action.GuideAction.java generate success.
+09:07:12 info  :com.emart.action.JobAction.java generate success.
+09:07:12 info  :com.emart.action.LoginLogAction.java generate success.
+09:07:12 info  :com.emart.action.ManagerAction.java generate success.
+09:07:12 info  :com.emart.action.MenuAction.java generate success.
+09:07:12 info  :com.emart.action.MessageAction.java generate success.
+09:07:12 info  :com.emart.action.NewsAction.java generate success.
+09:07:12 info  :com.emart.action.NewsCategoryAction.java generate success.
+09:07:12 info  :com.emart.action.OrderAction.java generate success.
+09:07:12 info  :com.emart.action.OrderMapAction.java generate success.
+09:07:12 info  :com.emart.action.PointAction.java generate success.
+09:07:12 info  :com.emart.action.PrivilegeAction.java generate success.
+09:07:12 info  :com.emart.action.ProductAction.java generate success.
+09:07:12 info  :com.emart.action.ProductAskAction.java generate success.
+09:07:12 info  :com.emart.action.ProductCategoryAction.java generate success.
+09:07:12 info  :com.emart.action.ProductCommentAction.java generate success.
+09:07:12 info  :com.emart.action.ProductPictureAction.java generate success.
+09:07:12 info  :com.emart.action.ProductPropertyAction.java generate success.
+09:07:12 info  :com.emart.action.ProductTypeAction.java generate success.
+09:07:12 info  :com.emart.action.PropertyValueAction.java generate success.
+09:07:12 info  :com.emart.action.RegionAction.java generate success.
+09:07:12 info  :com.emart.action.RoleAction.java generate success.
+09:07:12 info  :com.emart.action.ShelfAction.java generate success.
+09:07:12 info  :com.emart.action.UrlAction.java generate success.
+09:07:12 info  :com.emart.action.UserAction.java generate success.
+09:07:12 info  :com.emart.action.UserDetailAction.java generate success.
+09:07:12 info  :com.emart.action.UserTypeAction.java generate success.
+09:07:12 info  :com.emart.action.UrlPrivilegeAction.java generate success.
+09:07:13 info  :E:/eclipse/workspace/JxvaFramework/WebRoot/WEB-INF/jxva-dao.properties generate success.
+09:07:13 info  :E:/eclipse/workspace/JxvaFramework/WebRoot/WEB-INF/jxva-mvc.xml generate success.
+09:07:15 info  :automatic remove one connection from database connection pool,overtime is 3610 ms.
+09:07:15 info  :automatic remove one connection from database connection pool,overtime is 3610 ms.
+09:19:30 info  :Connection Provider Factory initializing...
+09:19:30 info  :JDBC Connection Provider initializing...
+09:19:30 info  :Database Connection Success.
+09:19:34 info  :automatic remove one connection from database connection pool,overtime is 3625 ms.
+09:19:44 info  :Connection Provider Factory initializing...
+09:19:44 info  :JDBC Connection Provider initializing...
+09:19:44 info  :Database Connection Success.
+09:19:48 info  :automatic remove one connection from database connection pool,overtime is 3609 ms.
+09:19:48 info  :automatic remove one connection from database connection pool,overtime is 3609 ms.
+09:21:58 info  :Connection Provider Factory initializing...
+09:21:58 info  :JDBC Connection Provider initializing...
+09:21:58 info  :Database Connection Success.
+09:22:01 info  :automatic remove one connection from database connection pool,overtime is 3609 ms.
+09:22:01 info  :automatic remove one connection from database connection pool,overtime is 3625 ms.
+09:22:13 info  :Connection Provider Factory initializing...
+09:22:13 info  :JDBC Connection Provider initializing...
+09:22:13 info  :com.emart.model.Finance.java generate success.
+09:22:13 info  :com.emart.model.Friend.java generate success.
+09:22:13 info  :com.emart.model.Group.java generate success.
+09:22:13 info  :com.emart.model.Guide.java generate success.
+09:22:13 info  :com.emart.model.Job.java generate success.
+09:22:13 info  :com.emart.model.LoginLog.java generate success.
+09:22:13 info  :com.emart.model.Manager.java generate success.
+09:22:13 info  :com.emart.model.Menu.java generate success.
+09:22:13 info  :com.emart.model.Message.java generate success.
+09:22:13 info  :com.emart.model.News.java generate success.
+09:22:13 info  :com.emart.model.NewsCategory.java generate success.
+09:22:13 info  :com.emart.model.Order.java generate success.
+09:22:13 info  :com.emart.model.OrderMap.java generate success.
+09:22:13 info  :com.emart.model.Point.java generate success.
+09:22:13 info  :com.emart.model.Privilege.java generate success.
+09:22:13 info  :com.emart.model.Product.java generate success.
+09:22:13 info  :com.emart.model.ProductAsk.java generate success.
+09:22:13 info  :com.emart.model.ProductCategory.java generate success.
+09:22:13 info  :com.emart.model.ProductCategoryMap.java generate success.
+09:22:13 info  :com.emart.model.ProductComment.java generate success.
+09:22:13 info  :com.emart.model.ProductProperty.java generate success.
+09:22:13 info  :com.emart.model.ProductType.java generate success.
+09:22:13 info  :com.emart.model.ProductTypeMap.java generate success.
+09:22:13 info  :com.emart.model.PropertyValue.java generate success.
+09:22:13 info  :com.emart.model.Region.java generate success.
+09:22:14 info  :com.emart.model.Role.java generate success.
+09:22:14 info  :com.emart.model.Shelf.java generate success.
+09:22:14 info  :com.emart.model.Url.java generate success.
+09:22:14 info  :com.emart.model.User.java generate success.
+09:22:14 info  :com.emart.model.UserDetail.java generate success.
+09:22:14 info  :com.emart.model.UserType.java generate success.
+09:22:14 info  :com.emart.model.UrlPrivilege.java generate success.
+09:22:14 info  :com.emart.dao.FinanceDao.java generate success.
+09:22:14 info  :com.emart.dao.FriendDao.java generate success.
+09:22:14 info  :com.emart.dao.GroupDao.java generate success.
+09:22:14 info  :com.emart.dao.GuideDao.java generate success.
+09:22:14 info  :com.emart.dao.JobDao.java generate success.
+09:22:14 info  :com.emart.dao.LoginLogDao.java generate success.
+09:22:14 info  :com.emart.dao.ManagerDao.java generate success.
+09:22:14 info  :com.emart.dao.MenuDao.java generate success.
+09:22:14 info  :com.emart.dao.MessageDao.java generate success.
+09:22:14 info  :com.emart.dao.NewsDao.java generate success.
+09:22:14 info  :com.emart.dao.NewsCategoryDao.java generate success.
+09:22:14 info  :com.emart.dao.OrderDao.java generate success.
+09:22:14 info  :com.emart.dao.OrderMapDao.java generate success.
+09:22:14 info  :com.emart.dao.PointDao.java generate success.
+09:22:14 info  :com.emart.dao.PrivilegeDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductAskDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductCategoryDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductCategoryMapDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductCommentDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductPropertyDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductTypeDao.java generate success.
+09:22:14 info  :com.emart.dao.ProductTypeMapDao.java generate success.
+09:22:14 info  :com.emart.dao.PropertyValueDao.java generate success.
+09:22:14 info  :com.emart.dao.RegionDao.java generate success.
+09:22:14 info  :com.emart.dao.RoleDao.java generate success.
+09:22:14 info  :com.emart.dao.ShelfDao.java generate success.
+09:22:14 info  :com.emart.dao.UrlDao.java generate success.
+09:22:14 info  :com.emart.dao.UserDao.java generate success.
+09:22:14 info  :com.emart.dao.UserDetailDao.java generate success.
+09:22:14 info  :com.emart.dao.UserTypeDao.java generate success.
+09:22:14 info  :com.emart.dao.UrlPrivilegeDao.java generate success.
+09:22:14 info  :com.emart.action.FinanceAction.java generate success.
+09:22:14 info  :com.emart.action.FriendAction.java generate success.
+09:22:14 info  :com.emart.action.GroupAction.java generate success.
+09:22:14 info  :com.emart.action.GuideAction.java generate success.
+09:22:14 info  :com.emart.action.JobAction.java generate success.
+09:22:14 info  :com.emart.action.LoginLogAction.java generate success.
+09:22:14 info  :com.emart.action.ManagerAction.java generate success.
+09:22:14 info  :com.emart.action.MenuAction.java generate success.
+09:22:14 info  :com.emart.action.MessageAction.java generate success.
+09:22:14 info  :com.emart.action.NewsAction.java generate success.
+09:22:14 info  :com.emart.action.NewsCategoryAction.java generate success.
+09:22:14 info  :com.emart.action.OrderAction.java generate success.
+09:22:14 info  :com.emart.action.OrderMapAction.java generate success.
+09:22:14 info  :com.emart.action.PointAction.java generate success.
+09:22:14 info  :com.emart.action.PrivilegeAction.java generate success.
+09:22:14 info  :com.emart.action.ProductAction.java generate success.
+09:22:14 info  :com.emart.action.ProductAskAction.java generate success.
+09:22:14 info  :com.emart.action.ProductCategoryAction.java generate success.
+09:22:14 info  :com.emart.action.ProductCategoryMapAction.java generate success.
+09:22:14 info  :com.emart.action.ProductCommentAction.java generate success.
+09:22:14 info  :com.emart.action.ProductPropertyAction.java generate success.
+09:22:14 info  :com.emart.action.ProductTypeAction.java generate success.
+09:22:14 info  :com.emart.action.ProductTypeMapAction.java generate success.
+09:22:14 info  :com.emart.action.PropertyValueAction.java generate success.
+09:22:14 info  :com.emart.action.RegionAction.java generate success.
+09:22:14 info  :com.emart.action.RoleAction.java generate success.
+09:22:14 info  :com.emart.action.ShelfAction.java generate success.
+09:22:14 info  :com.emart.action.UrlAction.java generate success.
+09:22:14 info  :com.emart.action.UserAction.java generate success.
+09:22:14 info  :com.emart.action.UserDetailAction.java generate success.
+09:22:14 info  :com.emart.action.UserTypeAction.java generate success.
+09:22:14 info  :com.emart.action.UrlPrivilegeAction.java generate success.
+09:22:14 info  :C:/Documents and Settings/Administrator/桌面/新建文件夹/jxva-dao.properties generate success.
+09:22:16 info  :automatic remove one connection from database connection pool,overtime is 3610 ms.
+09:22:16 info  :automatic remove one connection from database connection pool,overtime is 3610 ms.
+09:37:55 info  :Connection Provider Factory initializing...
+09:37:55 info  :JDBC Connection Provider initializing...
+09:37:55 info  :Database Connection Success.
+09:37:59 info  :automatic remove one connection from database connection pool,overtime is 3609 ms.
+09:39:43 info  :Connection Provider Factory initializing...
+09:39:43 info  :JDBC Connection Provider initializing...
+09:39:43 info  :com.emart.model.Finance.java generate success.
+09:39:43 info  :com.emart.model.Friend.java generate success.
+09:39:43 info  :com.emart.model.Group.java generate success.
+09:39:43 info  :com.emart.model.Guide.java generate success.
+09:39:43 info  :com.emart.model.Job.java generate success.
+09:39:43 info  :com.emart.model.LoginLog.java generate success.
+09:39:43 info  :com.emart.model.Manager.java generate success.
+09:39:44 info  :com.emart.model.Menu.java generate success.
+09:39:44 info  :com.emart.model.Message.java generate success.
+09:39:44 info  :com.emart.model.News.java generate success.
+09:39:44 info  :com.emart.model.NewsCategory.java generate success.
+09:39:44 info  :com.emart.model.Order.java generate success.
+09:39:44 info  :com.emart.model.OrderMap.java generate success.
+09:39:44 info  :com.emart.model.Point.java generate success.
+09:39:44 info  :com.emart.model.Privilege.java generate success.
+09:39:44 info  :com.emart.model.Product.java generate success.
+09:39:44 info  :com.emart.model.ProductAsk.java generate success.
+09:39:44 info  :com.emart.model.ProductCategory.java generate success.
+09:39:44 info  :com.emart.model.ProductCategoryMap.java generate success.
+09:39:44 info  :com.emart.model.ProductComment.java generate success.
+09:39:44 info  :com.emart.model.ProductProperty.java generate success.
+09:39:44 info  :com.emart.model.ProductType.java generate success.
+09:39:44 info  :com.emart.model.ProductTypeMap.java generate success.
+09:39:44 info  :com.emart.model.PropertyValue.java generate success.
+09:39:44 info  :com.emart.model.Region.java generate success.
+09:39:44 info  :com.emart.model.Role.java generate success.
+09:39:44 info  :com.emart.model.Shelf.java generate success.
+09:39:44 info  :com.emart.model.Supplier.java generate success.
+09:39:44 info  :com.emart.model.Url.java generate success.
+09:39:44 info  :com.emart.model.User.java generate success.
+09:39:44 info  :com.emart.model.UserDetail.java generate success.
+09:39:44 info  :com.emart.model.UserType.java generate success.
+09:39:44 info  :com.emart.model.UrlPrivilege.java generate success.
+09:39:44 info  :com.emart.dao.FinanceDao.java generate success.
+09:39:44 info  :com.emart.dao.FriendDao.java generate success.
+09:39:44 info  :com.emart.dao.GroupDao.java generate success.
+09:39:44 info  :com.emart.dao.GuideDao.java generate success.
+09:39:44 info  :com.emart.dao.JobDao.java generate success.
+09:39:44 info  :com.emart.dao.LoginLogDao.java generate success.
+09:39:44 info  :com.emart.dao.ManagerDao.java generate success.
+09:39:44 info  :com.emart.dao.MenuDao.java generate success.
+09:39:44 info  :com.emart.dao.MessageDao.java generate success.
+09:39:44 info  :com.emart.dao.NewsDao.java generate success.
+09:39:44 info  :com.emart.dao.NewsCategoryDao.java generate success.
+09:39:44 info  :com.emart.dao.OrderDao.java generate success.
+09:39:44 info  :com.emart.dao.OrderMapDao.java generate success.
+09:39:44 info  :com.emart.dao.PointDao.java generate success.
+09:39:44 info  :com.emart.dao.PrivilegeDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductAskDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductCategoryDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductCategoryMapDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductCommentDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductPropertyDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductTypeDao.java generate success.
+09:39:44 info  :com.emart.dao.ProductTypeMapDao.java generate success.
+09:39:44 info  :com.emart.dao.PropertyValueDao.java generate success.
+09:39:44 info  :com.emart.dao.RegionDao.java generate success.
+09:39:44 info  :com.emart.dao.RoleDao.java generate success.
+09:39:44 info  :com.emart.dao.ShelfDao.java generate success.
+09:39:44 info  :com.emart.dao.SupplierDao.java generate success.
+09:39:44 info  :com.emart.dao.UrlDao.java generate success.
+09:39:44 info  :com.emart.dao.UserDao.java generate success.
+09:39:44 info  :com.emart.dao.UserDetailDao.java generate success.
+09:39:44 info  :com.emart.dao.UserTypeDao.java generate success.
+09:39:44 info  :com.emart.dao.UrlPrivilegeDao.java generate success.
+09:39:44 info  :C:/Documents and Settings/Administrator/桌面/新建文件夹/jxva-dao.properties generate success.

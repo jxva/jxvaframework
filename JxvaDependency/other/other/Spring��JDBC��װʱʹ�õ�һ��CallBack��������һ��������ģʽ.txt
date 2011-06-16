@@ -1,0 +1,152 @@
+Spring对JDBC封装时使用的一种CallBack来参数化一个操作的模式收藏
+
+ Spring对JDBC的封装避免了大量的JDBC低级操作，简化了代码，下面我们看看Spring除
+了使用Template方法模式来简化我们编写的代码还使用了什么技巧。Spring使用了一种
+叫做CallBackHandler的接口,你可以很容易扩展这个接口来获得想要查询到的结果，下
+面举一个获得行信息的一个CallBackHandler,然后StringHandler实现获取查询到的String
+的例子：
+interface RowCallBackHandler...{
+    public void abstract processRow(ResultSet rs)throws SQLException;
+}
+
+class StringHandler implements RowCallBackHandler...{
+    private List list;
+    public void processRow(ResultSet rs)throws SQLException;...{
+        list.add(rs.getString(1));
+    }
+    
+    public String[] getStrings()...{
+    return (String[])list.toArray(new String[list.size()]))
+    }
+}
+
+public class  JdbcTemplate...{
+    //...other code
+    public query(String sql,RowCallBackHandler callBackHandler)...{
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try...{
+            // con = <code to get connetion>
+            ps = con.prepareStatement(sql);
+            rs.executeQuery();
+            while(rs.next())...{
+                callBackHandler.processRow(rs);
+            }
+            rs.close();
+            ps.close();
+        }catch(SQLException e)...{
+            e.printStackTrace();
+        }finally...{
+            DataSourceUtils.closeConnectonIfNecessary(this.dataSource,con);
+        }
+    }
+}
+
+public class SimpleTest...{
+    public static void main(String []args)...{
+        StringHandler sh = new StringHandler();
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.query("Select firstName from user",sh);
+        String []str = sh.getStrings();
+    }
+}
+
+ 
+
+这个模式关键的技巧是参数一个操作并JdbcTemplate中主动调用方法processRow()，将结
+果集中的信息添加到List中，这个可以说一种控制反转的思想。查询的结果是在查询过程中
+自动注入到我们的要接收查询结果的容器中的，用户不需要关心如何去获得查询结果，当需
+要结果是只需要getStrings()获得。
+用户只需要使用如下代码：
+StringHandler sh = new StringHandler();
+JdbcTemplate jdbcTemplate = new JdbcTemplate();
+jdbcTemplate.query("Select firstName from user",sh);
+String []str = sh.getStrings();
+就可以轻易获得查询的结果。
+不过这个模式可以说更多的是一种技巧，直观程度不够，从而使代码不容易理解和维护。
+
+
+
+
+
+
+=================
+
+ 以前每次看到程序中有回调的字眼，头都是很晕（不理解）。
+
+    看了一个testCase的例子：
+// 实现FilterChain new了 一个 特殊的实例  并且覆盖doFilter 方法
+这里我感觉还是相当巧妙的，我不用显式定义 继承FilterChain这个抽象类。
+ 
+ 
+
+   1.    final FilterChain filterChain = new FilterChain() {  
+   2.   
+   3.     public void doFilter(final ServletRequest arg0,  
+   4.   
+   5.             final ServletResponse arg1) throws IOException,  
+   6.   
+   7.             ServletException {  
+   8.   
+   9.         System.out.print("run filter");  
+  10.   
+  11.     }  
+  12.   
+  13. };  
+  14.   
+  15. try {  
+  16.   
+  17.     System.out.print("start filter");  
+  18.   
+  19.   
+  20.   
+  21.     this.filter.doFilter(request, response, filterChain);  
+  22.   
+  23.     assertNull(response.getRedirectedUrl());  
+  24.   
+  25. } catch (IOException e) {  
+  26.   
+  27.     // TODO Auto-generated catch block  
+  28.   
+  29.     e.printStackTrace();  
+  30.   
+  31. } catch (ServletException e) {  
+  32.   
+  33.     // TODO Auto-generated catch block  
+  34.   
+  35.     e.printStackTrace();  
+  36.   
+  37. }  
+
+
+
+
+第2个例子：
+ 
+
+   1. public int executeUpdate(final String hql, final Map pMap) {  
+   2.         int result = 0;  
+   3.         Object o = getHibernateTemplate().execute(new HibernateCallback() {  
+   4.             public Object doInHibernate(final Session session)  
+   5.                     throws HibernateException {  
+   6.                 int result = 0;  
+   7.                 Query queryObject = session.createQuery(hql);  
+   8.                 String[] params = queryObject.getNamedParameters();  
+   9.                 for (int i = 0, max = params.length; i < max; i++) {  
+  10.                     queryObject.setParameter(params[i], pMap.get(params[i]));  
+  11.                 }  
+  12.                 result = queryObject.executeUpdate();  
+  13.                 return result;  
+  14.   
+  15.             }  
+  16.         });  
+  17.         Integer i = (Integer) o;  
+  18.         result = i.intValue();  
+  19.         return result;  
+  20.     }  
+
+
+
+
+HibernateTemplate 巧妙使用了  HibernateCallback使得dao 的代码非常优雅！

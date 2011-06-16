@@ -1,0 +1,64 @@
+Java5泛型的用法，T.class的获取和为擦拭法站台
+载自:http://www.blogjava.net/calvin/archive/2006/04/28/43830.html 
+  Java 5的泛型语法已经有太多书讲了，这里不再打字贴书。GP一定有用，不然Java和C#不会约好了似的同时开始支持GP。但大家也清楚，GP和Ruby式的动态OO语言属于不同的意识形态，如果是一人一票，我想大部分的平民程序员更热衷动态OO语言的平白自然。但如果不准备跳槽到支持JSR223的动态语言，那还是看看GP吧。
+
+   胡乱总结泛型的四点作用：
+   第一是泛化，可以拿个T代表任意类型。 但GP是被C++严苛的静态性逼出来的，落到Java、C#这样的花语平原里----所有对象除几个原始类型外都派生于Object，再加上Java的反射功能，Java的Collection库没有范型一样过得好好的。
+
+   第二是泛型 + 反射，原本因为Java的泛型拿不到T.class而觉得泛型没用，最近才刚刚学到通过反射的API来获取T的Class，后述。
+
+   第三是收敛，就是增加了类型安全，减少了强制类型转换的代码。这点倒是Java Collection历来的弱项。
+
+   第四是可以在编译期搞很多东西，比如MetaProgramming。但除非能完全封闭于框架内部，框架的使用者和扩展者都不用学习这些东西的用法，否则那就是自绝于人民的票房毒药。C++的MetaProgramming好厉害吧，但对比一下Python拿Meta Programming生造一个Class出来的简便语法，就明白什么才是真正的叫好又叫座。
+
+   所以，作为一个架构设计师，应该使用上述的第2，3项用法，在框架类里配合使用反射和泛型，使得框架的能力更强； 同时采用收敛特性，本着对人民负责的精神，用泛型使框架更加类型安全，更少强制类型转换。
+  
+   擦拭法避免了Java的流血分裂 ：
+    大家经常骂Java GP的擦拭法实现，但我觉得多亏于它的中庸特性---如果你用就是范型，不用就是普通Object，避免了Java阵营又要经历一场to be or not to be的分裂。
+    最大的例子莫过Java 5的Collection 框架，比如有些同学坚持认为自己不会白痴到类型出错，而且难以忍受每个定义的地方都要带一个泛型定义List〈Book〉，不用强制类型转换所省下的代码还不够 N处定义花的(对了，java里面还没有tyepdef.....)，因此对范型十分不感冒，这时就要齐齐感谢这个搽拭法让你依然可以对一个泛型框架保持非泛型的用法了...
+
+   通过反射获得 T.class：
+   
+    不知为何书上不怎么讲这个，是差沙告诉我才知道的，最经典的应用见Hibernate wiki的Generic Data Access Objects， 代码如下： 
+Java代码
+
+   1. abstract public class BaseHibernateEntityDao<T> extends HibernateDaoSupport {  
+   2.  private Class<T> entityClass;  
+   3.  public BaseHibernateEntityDao() {  
+   4.         entityClass =(Class<T>) ((ParameterizedType) getClass()  
+   5.                                 .getGenericSuperclass()).getActualTypeArguments()[0];  
+   6.     }  
+   7.  public T get(Serializable id) {  
+   8.         T o = (T) getHibernateTemplate().get(entityClass, id);  
+   9. }  
+  10. }  
+
+abstract public class BaseHibernateEntityDao<T> extends HibernateDaoSupport {
+ private Class<T> entityClass;
+ public BaseHibernateEntityDao() {
+        entityClass =(Class<T>) ((ParameterizedType) getClass()
+                                .getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+ public T get(Serializable id) {
+        T o = (T) getHibernateTemplate().get(entityClass, id);
+}
+}
+
+  精华就是这句了：
+Java代码
+
+   1. Class<T> entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];   
+
+Class<T> entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]; 
+
+ 
+泛型之后，所有BaseHibernateEntityDao的子类只要定义了泛型，就无需再重载getEnttityClass()，get()函数和find()函数，销益挺明显的，所以SpringSide的Dao基类毫不犹豫就泛型了。
+
+  不过擦拭法的大棒仍在，所以子类的泛型语法可不能乱写，最正确的用法只有：
+   
+Java代码
+
+   1. public class BookDao extends BaseHibernateEntityDao<Book>  
+
+public class BookDao extends BaseHibernateEntityDao<Book>
+

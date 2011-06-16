@@ -1,0 +1,46 @@
+如何显示2个图片的合成效果，例如在文件上盖章，要求印章图片透明。
+
+　　假设文件图片为p1，印章图片为p2。
+
+
+BufferedImage bi1 = null;
+int x = 10;
+int y = 10;
+BufferedImage bi2 = null;
+try {
+bi1 = javax.imageio.ImageIO.read(new File("p1.jpg"));
+bi2 = javax.imageio.ImageIO.read(new File("p2.png"));
+} catch (IOException e) {
+e.printStackTrace();
+}
+
+Graphics g = bi1.getGraphics();
+g.drawImage(bi2, x, y, null);
+
+FileOutputStream out=null; //输出到文件流
+
+try {
+out = new FileOutputStream("p.jpg");
+JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+encoder.encode(bi1);
+out.close();
+} catch (IOException e) {
+e.printStackTrace();合并国
+} -
+
+　　p1背景图，p2印章，p为输出图。p2要是gif或png等支持透明图象的。
+
+　　x,y 为在背景图放置印章的坐标（ 左上角开始算）。
+
+
+　　在Java2D中设置画图的透明度：
+
+float alpha = 0.5f; // 透明度
+Graphics2D g2d = bufferedImage.createGraphics();
+
+// 设置透明
+g2d.setComposite(AlphaComposite.getInstance(
+AlphaComposite.SRC_ATOP, alpha)); // 开始
+// g2d.drawImage(); // 画图
+g2d.setComposite(AlphaComposite.getInstance(
+AlphaComposite.SRC_OVER)); // 结束 

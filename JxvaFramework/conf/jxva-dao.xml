@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+	<datasource>
+		<db-type></db-type>
+		<show-sql></show-sql>
+		<sys-table></sys-table>
+		<pkg_name></pkg_name>
+		<overtime></overtime>
+		<pool></pool>
+		<username></username>
+		<password></password>
+		<max-size></max-size>
+		<min-size></min-size>
+		<asia></asia>
+		<jndi></jndi>
+		<driver-class></driver-class>
+		<url></url>
+	</datasource>
+</jxva>

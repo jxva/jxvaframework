@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+	<cache name="default">
+		<strategy>Soft</strategy>
+		<algorithm>LRU</algorithm>
+		<max-size>1000</max-size>
+	</cache>
+</jxva>

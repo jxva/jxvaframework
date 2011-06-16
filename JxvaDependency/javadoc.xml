@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="protected"  additionalparam="-encoding utf-8 -charset utf-8 "  author="true" classpath="lib/swt-grouplayout.jar;lib/baseline.jar;lib/proxool-cglib.jar;lib/proxool-0.9.1.jar;lib/commons-pool-1.2.jar;lib/jsp-api.jar;lib/commons-logging-1.0.4.jar;lib/commons-dbcp-1.2.1.jar;lib/oracle.jar;lib/ejb-api-3.0.jar;lib/c3p0-0.9.1.2.jar;lib/jms-1.1.jar;lib/mysql-connector-java-5.1.6-bin.jar;lib/servlet-api-2.5.jar;lib/db2jcc_license_cu.jar;lib/db2jcc.jar;lib/el-api.jar;lib/commons-collections-3.2.jar;lib/junit.jar;lib/swt-3.4.1.jar;lib/sqljdbc.jar" destdir="doc" doctitle="Jxva Framework" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.jxva.oxm,com.jxva.tool.handler,com.jxva.security,com.jxva.cache,com.jxva.dao.entity,com.jxva.tool.tpl,com.jxva.dao.util,com.jxva.tool.ui,com.jxva.dao.dialect,com.jxva.dao,com.jxva.rbac,com.jxva.rbac.util,com.jxva.filter,com.jxva.tool.jdbc,com.jxva.dao.type,com.jxva.rbac.dao,com.jxva.graph,com.jxva.tool,com.jxva.rbac.handler,com.jxva.sso,com.jxva.jcache,com.jxva.dao.jdbc,com.jxva.dao.page,com.jxva.tool.model,com.jxva.tool.controller,com.jxva.swt,com.jxva.xml,com.jxva.dao.connection,com.jxva.dao.annotation,com.jxva.exception,com.jxva.util,com.jxva.tool.util,com.jxva.dao.impl,com.jxva.jms,com.jxva.log,com.jxva.mvc,com.jxva.license,com.jxva.tree,com.jxva.http,com.jxva.rbac.model,com.jxva.tag" source="1.6" sourcepath="src" splitindex="true" use="true" version="true">
+       	 <link href="http://java.sun.com/javase/6/docs/api/" />  
+        	</javadoc>
+
+    </target>
+</project>

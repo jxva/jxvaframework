@@ -1,0 +1,140 @@
+具有实例缓存的不可变类
+
+不可变类的实例的状态不会变化，这样的实例可以安全地被其他与之关联的对象共享，还可以安全地被多个线程共享。为了节省内存空间，优化程序的性能，应该尽可能地重用不可变类的实例，避免重复创建具有相同属性值的不可变类的实例。
+
+在JDK 1.5的基本类库中，对一些不可变类，如Integer类做了优化，它具有一个实例缓存，用来存放程序中经常使用的Integer实例。JDK 1.5的Integer类新增了一个参数，为int类型的静态工厂方法valueOf(int i)，它的处理流程如下：
+
+if(在实例缓存中存在取值为i的实例)
+
+直接返回这个实例
+
+else{
+
+用new语句创建一个取值为i的Integer实例
+
+把这个实例存放在实例缓存中
+
+返回这个实例
+
+}
+
+在以下程序代码中，分别用new语句和Integer类的valueOf(int i)方法来获得Integer实例。
+
+Integer a=new Integer(10);
+
+Integer b=new Integer(10);
+
+Integer c=Integer.valueOf(10);
+
+Integer d= Integer.valueOf(10);
+
+System.out.println(a==b); //打印false
+
+System.out.println(a==c); //打印false
+
+System.out.println(c==d); //打印true
+
+
+图11-4 引用变量与Integer对象的引用关系
+
+
+以上代码共创建了3个Integer对象，参见图11-4。每个new语句都会创建一个新的Integer对象。而Integer.valueOf(10)方法仅在第一次被调用时，创建取值为10的Integer对象，在第二次被调用时，直接从实例缓存中获得它。由此可见，在程序中用valueOf()静态工厂方法获得Integer对象，可以提高Integer对象的可重用性。
+
+到底如何实现实例的缓存呢？缓存并没有固定的实现方式，完善的缓存实现不仅要考虑何时把实例加入缓存，还要考虑何时把不再使用的实例从缓存中及时清除，以保证有效合理地利用内存空间。一种简单的实现是直接用Java集合来作为实例缓存。本章11.3.2节的例程11-8的Gender类中的Map类型的instancesBySex属性就是一个实例缓存，它存放了Gender.MALE和Gender.FEMALE这两个实例的引用。Gender类的getInstance()方法从缓存中寻找Gender实例，由于Gender类既是不可变类，又是枚举类，因此它的getInstance()方法不会创建新的Gender实例。
+
+下面的例程11-12是为本章11.3.3节介绍的不可变类Name类增加的一些代码，使它拥有了实例缓存和相应的静态工厂方法valueOf()。Name类的实例缓存中可能会加入大量Name对象，为了防止耗尽内存，在实例缓存中存放的是Name对象的软引用（SoftReference）。如果一个对象仅仅持有软引用，Java虚拟机会在内存不足的情况下回收它的内存，本章第11.6节（对象的强、软、弱和虚引用）对此做了进一步介绍。
+
+例程11-12 Name.java
+
+import java.util.Set;
+
+import java.util.HashSet;
+
+import java.util.Iterator;
+
+import java.lang.ref.*;
+
+public class Name {
+
+…
+
+//实例缓存，存放Name对象的软引用
+
+private static final Set<SoftReference<Name>> names=
+
+new HashSet<SoftReference<Name>>();
+
+public static Name valueOf(String firstname, String lastname){ //静态工厂方法
+
+Iterator<SoftReference<Name>> it=names.iterator();
+
+while(it.hasNext()){
+
+SoftReference<Name> ref=it.next(); //获得软引用
+
+Name name=ref.get(); //获得软引用所引用的Name对象
+
+if(name!=null
+
+&& name.firstname.equals(firstname)
+
+&& name.lastname.equals(lastname))
+
+return name;
+
+}
+
+//如果在缓存中不存在Name对象，就创建该对象，并把它的软引用加入到实例缓存
+
+Name name=new Name(firstname,lastname);
+
+names.add(new SoftReference<Name>(name));
+
+return name;
+
+}
+
+public static void main(String args[]){
+
+Name n1=Name.valueOf("小红","王");
+
+Name n2=Name.valueOf("小红","王");
+
+Name n3=Name.valueOf("小东","张");
+
+System.out.println(n1);
+
+System.out.println(n2);
+
+System.out.println(n3);
+
+System.out.println(n1==n2); //打印true
+
+}
+
+}
+
+在程序中，既可以通过new语句创建Name实例，也可以通过valueOf()方法创建Name实例。在程序的生命周期中，对于程序不需要经常访问的Name实例，应该使用new语句创建它，使它能及时结束生命周期；对于程序需要经常访问的Name实例，那就用 valueOf()方法来获得它，因为该方法能把Name实例放到缓存中，使它可以被重用。
+
+Tips
+
+从例程11-12的Name类也可以看出，在有些情况下，一个类可以同时提供public的构造方法和静态工厂方法。用户可以根据实际需要，灵活地决定到底以何种方式获得类的实例。
+
+ 
+
+另外要注意的是，没有必要为所有的不可变类提供实例缓存。随意创建大量实例缓存，反而会浪费内存空间，降低程序的运行性能。通常，只有满足以下条件的不可变类才需要实例缓存。
+
+ 不可变类的实例的数量有限。
+
+ 在程序运行过程中，需要频繁访问不可变类的一些特定实例。这些实例拥有与程序本身同样长的生命周期。
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 如果需要缓存不止一个对象，您可以使用一个 Map，但是可以选择如何使用软引用。您可以将缓存作为 Map<K, SoftReference<V>> 或 SoftReference<Map<K,V>> 管理。后一种选项通常更好一些，因为它给垃圾收集器带来的工作更少，并且允许在特别需要内存时以较少的工作回收整个缓存。弱引用有时会错误地用于取代软引用，用于构建缓存，但是这会导致差的缓存性能。在实践中，弱引用将在对象变得弱可及之后被很快地清除掉 —— 通常是在缓存的对象再次用到之前 —— 因为小的垃圾收集运行得很频繁。
+
+ 

@@ -1,0 +1,654 @@
+ANTLR 介绍
+作者： Terence
+Parr
+译者：Nicholas @ NirvanaStudio
+
+
+原文出处：http://www.cs.usfca.edu/~parrt/course/652/lectures/antlr.html
+
+
+
+介绍
+自1980年以来我手工编写了很多识别程序（recognizer）和翻译程序（translator）但最终我感到很恶心并且尝试将这个过程自动化：来源于我的座右铭：
+
+“Why program by hand in five days what you can spend five years of your life automating.“
+手工编写过很多程序之后你就可以发现一些共性，并且这些共性可以合理地格式化并且自动生成。我当时对yacc不是很熟悉但是想要一些东西去代替我原本需要手工
+
+编码的工作。ANTLR就是这个最终的结果（实际上原来它叫做PCCTS）。我现在已经为之工作了十年了。
+
+ANTLR, ANother Tool for Language Recognition, 是一个可以接受含有语法描述的语言描述符并且生成程序能够识别这些语言所产生的句子。作为一个翻译程序的
+
+一部分，你可以给你的语法附上简单的操作符和行为并且告诉ANTLR如何构造AST并且如何输出它们。ANTLR知道如何使用Java，C++，C#或者Python来生成它们。
+
+ANTLR知道如何构造识别程序并且将语法结构应用到三种不同的输入上：(i) 字符流，
+(ii) 标记（token）流，(iii) 二维树结构。本质上这些对应了词法分析器（Lexer），解析器（Parser）和Tree Walker。用于制定这些语法（Grammar）的句法（Syntax），被称
+
+为meta-language，在所有情况下是独立的。
+
+一旦你适应了ANTLR或者相应的工具，你将会以另一种眼光来看待编程。很多任务期待一种不同于传统编程语言流派的语言解决方案。举个例子，这些课程的笔记就是用TML编写
+
+的，Terence’s Markup Language。我讨厌输入HTML所以我用ANTLR编写了一个简单的翻译程序来转换文本成为HTML或者PDF或者其他我讨厌直接编写的东西。
+
+最后，情让我指出ANTLR仅仅是一个工具！它帮你通过自动生成单调乏味的组件来构造程序，但并不试图让你创造一个完整的编译器，举个例子，单行的描述。
+
+在2003年以前，ANTLR的下载量一度达到5000每月。当时ANTLR直接暴露在公共域而且没有一个明确的版权但是附带了完整的源代码。
+
+这些笔记假设你已经熟悉了基本的语言识别和翻译概念。那么现在你就需要熟悉ANTLR的元语言以及如何生成它。之后，我们将把焦点集中在构造复杂的翻译器上。
+
+一个对 ANTLR 句法的简单介绍
+了解ANTLR最好的办法就是通过例子。一个简单的计算器经常被用来作为起步教程，并且有一个很好的理由支持这么做：它容易理解且实现简单。还有一些ANTLR例子和教程，但
+
+是在这里我将会用自己的语言来描述一个计算器。首先我们将要做一些东西可以直接计算这些简单的表达式。然后我们将会生成树并且计算这课树得到相同的结果。
+
+当你知道最后需要将输入的字符流断开成为一个个的记号（token），思考表达式的语法结构是一个良好的开端。
+
+直接执行句法
+识别程序
+让我们编写一个程序来接受一个带有加、减、乘，例如3+4*5-1的表达式，或者带有括号的，用来强行限制计算顺序的如(3+4)*5的表达式。
+
+所有ANTLR语法都是Lexer、Parser或者TreeParser的子类，因此你需要从语法的层次上来思考这些东西，你将会构造一个Parser的子类
+
+。在类声明之后，内需要用EBNF符号来制定规则：
+
+
+
+class ExprParser extends Parser;
+
+expr:   mexpr ((PLUS|MINUS) mexpr)*
+
+    ;      
+
+
+mexpr
+
+    :   atom (STAR atom)*
+
+    ;    
+
+
+atom:   INT
+
+    |   LPAREN expr RPAREN
+
+    ;
+
+
+这个词法分析器遵循了一个相似的模式并且只需要定义一些操作符和空格。将这些词法放入一个文件中，expr.g，是最简单的方法：
+
+
+
+class ExprLexer extends Lexer;
+
+options {
+
+    k=2; // needed for newline junk
+
+    charVocabulary=’\u0000′..’\u007F’; // allow ascii
+
+}
+
+
+LPAREN: ‘(’ ;
+
+RPAREN: ‘)’ ;
+
+PLUS  : ‘+’ ;
+
+MINUS : ‘-’ ;
+
+STAR  : ‘*’ ;
+
+INT   : (’0′..’9′)+ ;
+
+WS    : ( ‘ ‘
+
+        | ‘\r’ ‘\n’
+
+        | ‘\n’
+
+        | ‘\t’
+
+        )
+
+        {$setType(Token.SKIP);}
+
+      ;
+
+
+要生成一个采用Java解释的语法，用如下方式：
+
+
+
+$ java antlr.Tool expr.g
+
+ANTLR Parser Generator   Version 2.7.2   1989-2003 jGuru.com
+
+$
+
+ANTLR 生成了什么？
+ANTLR生成的识别程序模仿了你需要手工编写的递归的解析器；yacc和它的朋友，另一方面，生成了一个满是整数的表来模拟有限状态机的行为。
+
+ANTLR 将会生成以下文件：
+
+
+
+ExprLexer.java
+
+ExprParser.java
+
+ExprParserTokenTypes.java
+
+ExprParserTokenTypes.txt
+
+如果你看下生成的代码，举个例子，ExprParser.java，你将会看到对语法解析文件expr.g中的每个规则生成了一个函数。举个例子，mexpr和
+
+atom的代码应该是这样：
+
+
+
+public void mexpr() {
+
+  atom();
+
+  while ( LA(1)==STAR ) {
+
+    match(STAR);
+
+    atom();
+
+  }
+
+}
+
+public void atom() {
+
+  switch ( LA(1) ) { // switch on lookahead token type
+
+    case INT :
+
+      match(INT);
+
+      break;
+
+    case LPAREN :
+
+      match(LPAREN);
+
+      expr();
+
+      match(RPAREN);
+
+      break;
+
+    default :
+
+      // error
+
+  }
+
+}
+
+
+注意这些规则引用被翻译成了函数，记号引用被翻译成了match(TOKEN)调用。从一个语法文件构造解析器的唯一难点就是计算lookahead信息。
+
+记号类型这个类定义了记号类型常量，以便于词法分析和语法分析之用：
+
+
+
+// $ANTLR 2.7.2: “expr.g” -> “ExprParser.java”$
+
+public interface ExprParserTokenTypes {
+
+        int EOF = 1;
+
+        int NULL_TREE_LOOKAHEAD = 3;
+
+        int PLUS = 4;
+
+        int MINUS = 5;
+
+        int STAR = 6;
+
+        int INT = 7;
+
+        int LPAREN = 8;
+
+        int RPAREN = 9;
+
+        int WS = 10;
+
+}
+
+
+测试词法分析和语法分析
+要使用生成的解析器，在ExprParser.java中，使用如下main()函数：
+
+
+
+import antlr.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        ExprLexer lexer = new ExprLexer(System.in);
+
+        ExprParser parser = new ExprParser(lexer);
+
+        parser.expr();
+
+    }
+
+}
+
+
+
+$ java Main
+
+3+(4*5)
+
+$
+
+或者针对无效输入：
+
+
+
+$ java Main
+
+3++
+
+line 1:3: unexpected token: +
+
+$
+
+或者
+
+
+
+$ java Main
+
+3+(4
+
+line 1:6: expecting RPAREN, found ‘null’
+
+$
+
+表达式计算
+要实际计算表达式，只需要给解析器增加行为：
+
+
+
+class ExprParser extends Parser;
+
+expr returns [int value=0]
+
+{int x;}
+
+    :   value=mexpr
+
+        ( PLUS x=mexpr  {value += x;}
+
+        | MINUS x=mexpr {value -= x;}
+
+        )*
+
+    ;
+
+
+mexpr returns [int value=0]
+
+{int x;}
+
+    :   value=atom ( STAR x=atom {value *= x;} )*
+
+    ;
+
+
+atom returns [int value=0]
+
+    :   i:INT {value=Integer.parseInt(i.getText());}
+
+    |   LPAREN value=expr RPAREN
+
+    ;
+
+
+词法分析也是一样，除了增加一个print语句在主函数中：
+
+
+
+import antlr.*;
+
+public class Main {
+
+        public static void main(String[] args) throws Exception {
+
+                ExprLexer lexer = new ExprLexer(System.in);
+
+                ExprParser parser = new ExprParser(lexer);
+
+                int x = parser.expr();
+
+                System.out.println(x);
+
+        }
+
+}
+
+
+现在，当你运行程序，你会得到一下结果：
+
+
+
+$ java Main
+
+3+4*5
+
+23
+
+$ java Main
+
+(3+4)*5
+
+35
+
+$
+
+ANTLR 如何翻译动作
+动作通常会被放入生成的解析器的代码中：
+
+像下面的return规则
+
+
+
+mexpr returns [int value=0]
+
+  : …
+
+  ;
+
+被翻译为
+
+
+
+public int mexpr() {
+
+  int value=0;
+
+  …
+
+  return value;
+
+}
+
+如果你增加一个参数，这个参数同样复制到了方法的定义：
+
+
+
+mexpr[int x] returns [int value=0]
+
+  : … {value = x;}
+
+  ;
+
+生成
+
+
+
+public int mexpr(int x) {
+
+  int value=0;
+
+  …
+
+  value = x;
+
+  return value;
+
+}
+
+所以，完整的mexpr和atom翻译规则看起来像下面的代码：
+
+
+
+public int mexpr() {
+
+  int value=0;
+
+  int x; // local variable def from rule mexpr
+
+  value = atom();
+
+  while ( LA(1)==STAR ) {
+
+    match(STAR);
+
+    x = atom();
+
+    value *= x;
+
+  }
+
+  return value;
+
+}
+
+public int atom() {
+
+  int value=0;
+
+  switch ( LA(1) ) { // switch on lookahead token type
+
+    case INT :
+
+      Token i = LT(1); // make label i point to next lookahead token object
+
+      match(INT);
+
+      value=Integer.parseInt(i.getText()); // compute int value of token
+
+      break;
+
+    case LPAREN :
+
+      match(LPAREN);
+
+      value = expr(); // return whatever expr() computes
+
+      match(RPAREN);
+
+      break;
+
+    default :
+
+      // error
+
+  }
+
+  return value;
+
+}
+
+
+通过AST中间形式计算结果
+现在你看到了一个基本的直接基于句法的翻译/计算描述，里面的语法/句法制定了何时执行动作
+一个强有力的策略就是构造一个间接的表示形式持有所有或者大多数编码过的输入符号，在数据结构中，包含这些记号的关系。
+举个例子，输入“3+4”可以通过一个抽象语法树（AST）来表示：
+
+
+
+  +
+
+ / \
+
+3   4
+
+针对这种树，内需要一个TreeWalker（由ANTLR从一个树语法中生成）来计算之前的相同值，但是采用了一个不同的方式。
+
+AST的用法变得很清晰，就是当你需要从多次遍历这棵树来指出什么需要计算或者重写，或将树转变为另一种语言的时候就需要用AST。
+
+构造AST
+用ANTLR来生成一个有用的AST非常容易。在我们的例子中，打开buildAST选项并且增加一些后缀操作符告诉ANTLR何种记号需要构成子树的根节点。
+
+
+
+class ExprParser extends Parser;
+
+options {
+
+        buildAST=true;
+
+}
+
+
+expr:   mexpr ((PLUS^|MINUS^) mexpr)*
+
+    ;
+
+
+mexpr
+
+    :   atom (STAR^ atom)*
+
+    ;
+
+
+atom:   INT
+
+    |   LPAREN! expr RPAREN!
+
+    ;
+
+
+然后，词法不需要改变，用来计算树结果的主程序如下：
+
+
+
+import antlr.*;
+
+import antlr.collections.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        ExprLexer lexer = new ExprLexer(System.in);
+
+        ExprParser parser = new ExprParser(lexer);
+
+        parser.expr();
+
+        AST t = parser.getAST();
+
+        System.out.println(t.toStringTree());
+
+    }
+
+}
+
+
+
+
+$ java Main
+
+3+4
+
+ ( + 3 4 )
+
+$ java Main
+
+3+4*5
+
+ ( + 3 ( * 4 5 ) )
+
+$ java Main
+
+(3+4)*5
+
+ ( * ( + 3 4 ) 5 )
+
+$
+
+AST 解析与计算
+通过以上的解析器构造的树非常简单。在TreeParser中一条规则就够了。
+
+
+
+class ExprTreeParser extends TreeParser;
+
+options {
+
+    importVocab=ExprParser;
+
+}
+
+
+expr returns [int r=0]
+
+{ int a,b; }
+
+    :   #(PLUS  a=expr b=expr)  {r = a+b;}
+
+    |   #(MINUS a=expr b=expr)  {r = a-b;}
+
+    |   #(STAR  a=expr b=expr)  {r = a*b;}
+
+    |   i:INT                   {r = (int)Integer.parseInt(i.getText());}
+
+    ;
+
+
+主程序被修改成了使用新的TreeParser来实现计算功能：
+
+
+
+import antlr.*;
+
+import antlr.collections.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+
+        ExprLexer lexer = new ExprLexer(System.in);
+
+        ExprParser parser = new ExprParser(lexer);
+
+        parser.expr();
+
+        AST t = parser.getAST();
+
+        System.out.println(t.toStringTree());
+
+        ExprTreeParser treeParser = new ExprTreeParser();
+
+        int x = treeParser.expr(t);
+
+        System.out.println(x);
+
+    }
+
+}
+
+
+现在你得到了树结构以及计算结果。
+
+
+
+$ java Main
+
+3+4
+
+ ( + 3 4 )
+
+7
+
+$ java Main
+
+3+(4*5)+10
+
+ ( + ( + 3 ( * 4 5 ) ) 10 )
+
+33
+
+$

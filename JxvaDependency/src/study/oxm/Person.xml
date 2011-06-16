@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--xml database test-->
+<root auto="32" autonode="msgid"> 
+  <rs msgid="5"> 
+    <name type="java.lang.String">hahha</name>  
+    <sex type="java.lang.String">男</sex>  
+    <date type="java.sql.Timestamp">2008-01-26 17:20:28.0</date>  
+    <email type="java.lang.String">wangjie@javaw.com</email>  
+    <QQ type="java.lang.String">12345678</QQ> 
+  </rs> 
+</root>

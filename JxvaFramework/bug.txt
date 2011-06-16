@@ -1,0 +1,11 @@
+1. findUnique不支持别名查询
+
+//TODO 	select count(*) from News n where n.categoryId=?
+//OK	select count(*) from News where categoryId=?
+public Object findUnique(String jql, Object arg)throws DAOException;
+Demo:	int total=((Long)dao.findUnique("select count(*) from News n where n.categoryId=?",categoryId)).intValue();
+
+2010-07-25
+2. HtmlUtil中的filter无法过滤掉onload="javascript:if(this.width>740)this.width=740;"这种带有双引号中间有大于,小于符合的代码
+
+增加了先去掉双引号之间的字符,再过滤掉HTML代码

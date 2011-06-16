@@ -1,0 +1,163 @@
+ 通过jQuery内置的AJAX功能，直接访问后台获得JSON格式的数据，然后通过jQuer把数据绑定到事先设计好的html模板上，直接在页面上显示。
+我们先来看一下html模板：
+<table id="datas" border="1" cellspacing="0" style="border-collapse: collapse">
+                <tr>
+                    <th>
+                        订单ID</th>
+                    <th>
+                        客户ID</th>
+                    <th>
+                        雇员ID</th>
+                    <th>
+                        订购日期</th>
+                    <th>
+                        发货日期</th>
+                    <th>
+                        货主名称</th>
+                    <th>
+                        货主地址</th>
+                    <th>
+                        货主城市</th>
+                    <th>
+                        更多信息</th>
+                </tr>
+                <tr id="template">
+                    <td id="OrderID">
+                    </td>
+                    <td id="CustomerID">
+                    </td>
+                    <td id="EmployeeID">
+                    </td>
+                    <td id="OrderDate">
+                    </td>
+                    <td id="ShippedDate">
+                    </td>
+                    <td id="ShippedName">
+                    </td>
+                    <td id="ShippedAddress">
+                    </td>
+                    <td id="ShippedCity">
+                    </td>
+                    <td id="more">
+                    </td>
+                </tr>
+            </table>
+  
+        一定要注意的就是里面所有的id属性，这个是一个关键。再来看一下AJAX请求和绑定数据的代码。
+$.ajax(...{
+            type: "get",//使用get方法访问后台
+            dataType: "json",//返回json格式的数据
+            url: "BackHandler.ashx",//要访问的后台地址
+            data: "pageIndex=" + pageIndex,//要发送的数据
+            complete :function()...{$("#load").hide();},//AJAX请求完成时隐藏loading提示
+            success: function(msg)...{//msg为返回的数据，在这里做数据绑定
+                var data = msg.table;
+                $.each(data, function(i, n)...{
+                    var row = $("#template").clone();
+                    row.find("#OrderID").text(n.订单ID);
+                    row.find("#CustomerID").text(n.客户ID);
+                    row.find("#EmployeeID").text(n.雇员ID);
+                    row.find("#OrderDate").text(ChangeDate(n.订购日期));
+                    if(n.发货日期!== undefined) row.find("#ShippedDate").text(ChangeDate(n.发货日期));
+                    row.find("#ShippedName").text(n.货主名称);
+                    row.find("#ShippedAddress").text(n.货主地址);
+                    row.find("#ShippedCity").text(n.货主城市);
+                    row.find("#more").html("<a href=OrderInfo.aspx?id=" + n.订单ID + "&pageindex="+pageIndex+">&nbsp;More</a>");                   
+                    row.attr("id","ready");//改变绑定好数据的行的id
+                    row.appendTo("#datas");//添加到模板的容器中
+                });
+        这个是jQuery的AJAX方法，返回数据并不复杂，主要说明一下怎么把数据按模板的定义显示到到页面上。首先是这个“var row = $("#template").clone();”先把模板复制一份，接下来row.find("#OrderID").text(n.订单ID);，表示找到id=OrderID的标记，设置它的innerText为相应的数据，当然也可以设置为html格式的数据。或者是通过外部的函数把数据转换成需要的格式，比如这里row.find("#OrderDate").text(ChangeDate(n.订购日期));有点服务器控件做模板绑定数据的感觉。
+       
+        所有的这些，都是放在一个静态的页面里，只通过AJAX方法从后台获取数据，所有html代码如下：
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>test1</title>
+    <script language="javascript" type="text/javascript" src="js/jquery-latest.pack.js"></script>
+    <script language="javascript" type="text/javascript" src="js/PageDate.js"></script>
+</head>
+<body>
+    <div>
+        &nbsp;<div>
+            <br />
+            <input id="first" type="button" value=" << " /><input id="previous" type="button"
+                value=" < " /><input id="next" type="button" value=" > " /><input id="last" type="button"
+                    value=" >> " />
+            &nbsp;<span id="pageinfo"></span>
+            <table id="datas" border="1" cellspacing="0" style="border-collapse: collapse">
+                <tr>
+                    <th>
+                        订单ID</th>
+                    <th>
+                        客户ID</th>
+                    <th>
+                        雇员ID</th>
+                    <th>
+                        订购日期</th>
+                    <th>
+                        发货日期</th>
+                    <th>
+                        货主名称</th>
+                    <th>
+                        货主地址</th>
+                    <th>
+                        货主城市</th>
+                    <th>
+                        更多信息</th>
+                </tr>
+                <tr id="template">
+                    <td id="OrderID">
+                    </td>
+                    <td id="CustomerID">
+                    </td>
+                    <td id="EmployeeID">
+                    </td>
+                    <td id="OrderDate">
+                    </td>
+                    <td id="ShippedDate">
+                    </td>
+                    <td id="ShippedName">
+                    </td>
+                    <td id="ShippedAddress">
+                    </td>
+                    <td id="ShippedCity">
+                    </td>
+                    <td id="more">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="load" style="left: 0px; position: absolute; top: 0px; background-color: red">
+            LOADING....
+        </div>
+        <input type="hidden" id="pagecount" />
+    </div>
+</body>
+</html>
+    PageData.js就是包括上面AJAX请求和绑定数据代码的js，整个页面连form都不用，这样做有什么好处呢。再看下面一个模板
+            <ul id="datas">
+                <li id="template">
+                    <span id="OrderID">
+                        fsdfasdf
+                    </span>
+                    <span id="CustomerID">
+                    </span>
+                    <span id="EmployeeID">
+                    </span>
+                    <span id="OrderDate">
+                    </span>
+                    <span id="ShippedDate">
+                    </span>
+                    <span id="ShippedName">
+                    </span>
+                    <span id="ShippedAddress">
+                    </span>
+                    <span id="ShippedCity">
+                    </span>
+                    <span id="more">
+                    </span>
+                </li>
+            </ul>
+    还是要注意id属性。大家看到这里应该明白了，不管用什么样的表现形式，只要id属性相同，就可以把数据绑定到对应的位置。这样的话，我们这些做程序的就不会因为美工的修改而修改代码了，而且美工也只要做出html就可以了，不需要为服务器控件做模板（不过我还没遇到过这样的美工，都是美工设计好了我来改成服务器控件的模板）。
+    再简单说一下AJAX请求的后台，用的是Access的Northwind数据库，把订单表放到DataTable里，然后通过DataTable2JSON（http://blog.csdn.net/luq885/archive/2007/06/05/1639853.aspx）转化成JSON数据格式传回来就完了，不过后台用了一些分页和缓存的方法，希望对初学者有一些帮助。
+    全部例子到http://www1.51ok.com/down.do?7A5EFE8D0FD43CDF61D8980635F8708A下载，其中test.htm是用table模板实现的，test2.htm是用ul模板实现的。效果如下：

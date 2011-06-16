@@ -1,0 +1,97 @@
+一. 基础知识:
+    信息摘要就是对一个数据块生成的数字指纹.也就是说对一个任意长度的数据块进行计算,产生一个唯一的指印.
+    信息摘要有两个基本属性:
+    1.两个不同的报文难以产生相同的数字指纹;
+    2.难以对一个数字指纹生成它的报文,而只能由报文反算出它的数字指纹;
+    信息摘要的代表算法有: SHA1,MD5
+
+JAVA中提供了信息摘要这两种算法的实现,使用方法如下:
+    首先生成一个MessageDigest类的对象,并确定将要使用的具体算法:
+    java.security.MessageDigest   alga=java.security.MessageDigest.getInstance("SHA-1");或java.security.MessageDigest alga=java.security.MessageDigest.getInstance("MD5");
+    给对象传入需要进行摘要运算的信息
+    alga.update(info.getBytes());
+    计算出摘要
+    byte[] digesta=alga.digest();(对于计算得到的摘要:SHA1是20位,MD5是16位)
+    复位
+    digesta.reset();
+示例代码如下:
+
+/*
+ * Created on 2005-3-21
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package org.redtroy;
+import java.security.*;
+import java.io.*;
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class Digest {
+    private MessageDigest md=null;
+   
+    private void init(String algrithm) throws Exception{
+        md=MessageDigest.getInstance(algrithm);
+    }
+    private void addInfo(String src){
+        md.update(src.getBytes());
+    }
+    private String calculate() {
+    byte tb;
+    char low;
+    char high;
+    char tmpChar;
+
+    byte[] bytes = md.digest();
+    String md5Str = new String();
+
+    for (int i = 0; i < bytes.length; i++) {
+      tb = bytes[i];
+
+      tmpChar = (char) ( (tb >>> 4) & 0x000f);
+
+      if (tmpChar >= 10) {
+        high = (char) ( ('a' + tmpChar) - 10);
+      }
+      else {
+        high = (char) ('0' + tmpChar);
+      }
+
+      md5Str += high;
+      tmpChar = (char) (tb & 0x000f);
+
+      if (tmpChar >= 10) {
+        low = (char) ( ('a' + tmpChar) - 10);
+      }
+      else {
+        low = (char) ('0' + tmpChar);
+      }
+
+      md5Str += low;
+    }
+
+    return md5Str;
+  }
+    private void clear(){
+        md.reset();
+    }
+   
+
+    public static void main(String[] args) {
+        Digest dg=new Digest();
+        try{
+        dg.init("SHA1");
+        dg.addInfo("redtroy");
+        System.out.print(dg.caculate());
+       dg.clear();
+       
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+       
+    }
+}

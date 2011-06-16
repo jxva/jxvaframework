@@ -1,0 +1,135 @@
+ 求和校验一般用来校验文件和信息是否正确的传送。举个例子，假设你想创建一个ZIP文件，然后将其传送到远程计算机上。当到达远程计算机后，你就可以使用checksum检验在传输过程中文件是否发生错误。为了演示如何创建checksums，在下面的实例中使用了两个新类，一个是CheckedInputStream，另一个是CheckedOutputStream。（注意：这两段代码在压缩与解压缩过程中，使用了同一种算法，求数据的checksum值。）
+
+Adler32和CRC32,它们实现了java.util.zip.Checksum接口，并估算了压缩数据的校验和（checksum）。在运算速度方面，Adler32算法比CRC32算法要有一定的优势；但在数据可信度方面，CRC32算法则要更胜一筹。大家只好在不同的场合下，加以取舍了。
+
+1.带checksum的压缩过程
+/*
+ * Created on 2005-11-30
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package com.redtroy.zip;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class CheckSumZip {
+    public void compresswithchecksum(File [] files,String target) throws FileNotFoundException,IOException{
+        FileOutputStream fos=new FileOutputStream(target);
+        CheckedOutputStream cos=new CheckedOutputStream(fos,new Adler32());
+        ZipOutputStream zos=new ZipOutputStream(new BufferedOutputStream(cos));
+        final int BUFFER=1024;
+        byte [] bytes=new byte[BUFFER];
+        for(int i=0;i<files.length;i++){
+            System.out.println("Adding file: "+files[i].getName()+" to zip");
+            FileInputStream fis=new FileInputStream(files[i]);
+            BufferedInputStream bis=new BufferedInputStream(fis);
+            ZipEntry ze=new ZipEntry(files[i].getName());
+            zos.putNextEntry(ze);
+            int count=0;
+            while((count=bis.read(bytes))!=-1){
+                zos.write(bytes);
+            }
+            bis.close();
+            fis.close();
+        }
+        zos.close();
+        fos.close();
+        System.out.println("Check sum is "+cos.getChecksum().getValue());
+        System.out.println("OK");
+    }
+    public static void main(String args[]){
+        File file1=new File("/home/redtroy/JDBC1.pdf");
+        File file2=new File("/home/redtroy/test1.html");
+        File [] files={file1,file2};
+        CheckSumZip zipper=new CheckSumZip();
+        try{
+        zipper.compresswithchecksum(files,"/home/redtroy/dd.zip");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+
+2.带checksum的解压过程
+/*
+ * Created on 2005-11-30
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package com.redtroy.zip;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.Adler32;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.CheckedInputStream;
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class CheckSumUnzip {
+    public void unzipwithchecksum(String sourcezipfile,String destpath) throws FileNotFoundException,IOException{
+        //create the zip stream
+        FileInputStream fis=new FileInputStream(sourcezipfile);
+        CheckedInputStream cis=new CheckedInputStream(fis,new Adler32());
+        ZipInputStream zis=new ZipInputStream(new BufferedInputStream(cis));
+        //create the output stream
+        final int BUFFER=1024;
+        ZipEntry ze=null;
+       
+       
+       
+        while((ze=zis.getNextEntry())!=null){
+           
+            FileOutputStream fos=new FileOutputStream(destpath+ze.getName());
+            BufferedOutputStream bos=new BufferedOutputStream(fos,BUFFER);
+            byte [] bytes=new byte[BUFFER];
+            int count=0;
+            while((count=zis.read(bytes))!=-1){
+                bos.write(bytes);
+            }
+            bos.flush();
+            bos.close();
+            fos.close();
+        }
+        zis.close();
+        fis.close();
+        System.out.println("former check sum is 3715052797");
+        System.out.println("Check sum is "+cis.getChecksum().getValue());
+        System.out.println("OK");
+    }
+    public static void main(String args[]){
+        CheckSumUnzip ud=new CheckSumUnzip();
+        try{
+            ud.unzipwithchecksum("/home/redtroy/dd.zip","/home/redtroy/bin/");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+

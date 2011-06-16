@@ -1,0 +1,49 @@
+http://www.java2s.com/Code/Java/Spring/JdbcTemplate.htm
+
+//得到只返回简单类型的查询(只有一个结果) 
+ public   Double   getNum(String   strsql)   { 
+          JdbcTemplate   jt   =   getJdbcTemplate();
+           double   num   =   (Double)   jt.queryForObject(strsql,   Double.class);
+                    return   num;    
+   }  
+   
+   如上代码可以运行了，多谢两位！
+   
+ ===================
+ 
+     public String getLastNameForId(Integer id) {  
+        String sql = "select last_name from person where id = ?";  
+        return (String) jdbcTemplate.queryForObject(sql, new Object[] { id },  
+                String.class);  
+    }  
+ 
+    public int getNumberOfPersons() {  
+        return jdbcTemplate.queryForInt("select count(*) from person");  
+    }   
+    
+===================
+
+public int[] updatePersons(final List persons) {  
+        String sql = "insert into person (id, firstName, lastName) values (?, ?, ?)";  
+        BatchPreparedStatementSetter setter = null;  
+        setter = new BatchPreparedStatementSetter() {  
+            public int getBatchSize() {  
+                return persons.size();  
+            }  
+ 
+            public void setValues(PreparedStatement ps, int index)  
+                    throws SQLException {  
+                Person person = (Person) persons.get(index);  
+                ps.setInt(0, person.getId().intValue());  
+                ps.setString(1, person.getFirstName());  
+                ps.setString(2, person.getLastName());  
+            }  
+        };  
+        return jdbcTemplate.batchUpdate(sql, setter);  
+    }  
+}   
+
+==========
+
+ jdbcTemplate.batchUpdate(new String[] { "update customer set first_name = 'FN#'",
+        "delete from customer where id > 2" });

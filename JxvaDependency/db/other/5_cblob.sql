@@ -1,0 +1,23 @@
+create table TEST_TABLE(
+   AA                   BIGINT                 not null,
+   BB                   BLOB,
+   CC                   CHAR,
+   DD                   CHARACTER,
+   EE                   CLOB,
+   FF                   DATE,
+   GG                   DECIMAL,
+   HH                   DOUBLE,
+   II                   DOUBLE PRECISION,
+   JJ                   FLOAT,
+   KK                   INT,
+   LL                   INTEGER,
+   MM                   LONG VARCHAR,
+   NN                   NUM,
+   OO                   NUMERIC,
+   PP                   REAL,
+   QQ                   SMALLINT,
+   RR                   TIME,
+   SS                   TIMESTAMP,
+   TT                   VARCHAR(1024),
+   primary key (AA)
+);

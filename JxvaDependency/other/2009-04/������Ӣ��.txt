@@ -1,0 +1,77 @@
+在这个部分,我会分成6个小节来分析标点符号的使用问题,大家可以根据自己的不同情况有选择的阅读.
+
+句点（Full Stop / Period，“.”）
+
+问号（Question Mark，“？”）
+
+感叹号（Exclamation Mark，“!”）
+
+逗点（Comma，“,”）
+
+冒号（Colon，“:”）
+
+分号（Semicolon，“;”）
+
+连字符（Hyphen，“-”）
+
+连接号（En Dash，“–”）
+
+破折号（Em Dash，“—”）
+
+括号（Parentheses，小括号“( )”；中括号“[]”；大括号“{}”）
+
+引号（Quotation Marks，双引号“"”；单引号“‘”）
+
+缩写及所有格符号（Apostrophe，“‘”）
+
+英语标点符号的用法很麻烦，我给大家找了点资料希望大家喜欢，对朋友有帮助
+
+一、.句点
+
+1.句点用于当一句话完全结束时。
+
+2.句点也可以用于英文单词的缩写，如 Mrs., Dr., P.S. 等。但要注意的是当缩写的字母形成了一个单词的时候就不要使用句点。如 IBM, DNA 等。
+
+二、？问号
+
+问号要用在一个直接的问句，而不是间接的。
+
+如 How will you solve the problem？ 是正确的用法，但用在 I wonder how you will solve the problem？就不对了，应该使用句点而不是问号。
+
+另外，在客气的用语中，也是用句点而不是问号.
+
+如 Will you please give me a call tomorrow.
+
+三、! 感叹号
+
+感叹号用于感叹和惊叹的陈述中，在商业写作中要注意感叹号的应用，因为不恰当的使用会显得突兀及不稳重。
+
+四、；分号
+
+1.与中文一样，分号用于分隔地位平等的独立子句。在某些情况下，使用分号比使用句点更显出子句之间的紧密联系，另外分号也经常与连接副词 thus, however, therefore一起使用(放在这些词语之前)。如 I realize I need exercise; however, I’ll lie down first to think about it.
+
+2.在句子中如果已经使用过逗点，为了避免歧义的产生，就用分号来分隔相似的内容。如 The employees were Tom Hanks, the manager; Jim White, the engineer; and Dr. Jack Lee.
+
+需要注意的是：一个完整的句子以大写字母开始，以句点结束。写英文时用逗点代替句点、分号、冒号或破折号叫“逗号错”，这正是中国学生所要避免的。请比较下列例句：
+
+误：It was raining hard, they could not work in the fields.
+
+（注意：上面句子中划横线的部分是两个不同的主语，而且逗点前后的句子是完整的-----单独拿出来都能代表一个完整的意思。因此，用逗号违反了英文规定，即一个句子只能有一套主干。）
+
+正：It was raining hard; they could not work in the fields.
+
+It was raining hard. They could not work in the fields.
+
+It was raining so hard that they could not work in the fields.
+
+They could not work in the fields because it was raining hard.
+
+It was raining hard, so they could not work in the fields.
+
+As it was raining hard, they could not work in the fields.
+
+误：The essay is poorly organized, there is no central idea.
+
+正：The essay is poorly organized; there is no central idea.
+
+The essay is poorly organized: there is no central idea. 

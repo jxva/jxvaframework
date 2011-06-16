@@ -1,0 +1,65 @@
+java对於文字的编码是以 unicode为基础，因此，若是以ZipInputStream及ZipOutputStream来处理压缩及解压缩的工作，碰到中文档名或路径，那当然是以unicode来处理罗！但是，现在市面上的压缩及解压缩软体，例如winzip，却是不支援unicode的，一碰到档名以unicode编码的档案，它就不处理。 那要如何才能做出让WinRar能够处理的压缩档呢？那就得从修改ZipInputStream及ZipOutputStream对於档名的编码方式来着手了。我们可以从jdk的src.zip取得ZipInputStream及ZipOutputStream的原始码来加以修改
+
+一、ZipOutputStream.java
+1.从jdk的src.zip取得ZipOutputStream.java原始码，另存到一个新文件中，档名改为CnZipOutputStream.java。
+2.开始修改原始码，将class名称改为CnZipOutputStream
+3.建构式也必须更改为CnZipOutputStream
+4.新增member，这个member记录编码方式
+private String encoding="UTF-8";
+5.再新增一个建构式(这个建构式可以让这个class在new的时候，设定档名的编码)
+public CZipOutputStream(OutputStream out,String encoding) {
+     this(out);
+     this.encoding=encoding;
+}
+6.找到byte[] nameBytes = getUTF8Bytes(e.name);(有二个地方)，将它修改如下：
+byte[] nameBytes = null; 
+try 
+{ 
+if (this.encoding.toUpperCase().equals("UTF-8")) 
+nameBytes =getUTF8Bytes(e.name); 
+else 
+nameBytes= e.name.getBytes(this.encoding); 
+} 
+catch(Exception byteE) 
+{ 
+nameBytes=getUTF8Bytes(e.name); 
+} 
+
+
+二、ZipInputStream.java
+1.从jdk的src.zip取得ZipInputStream.java原始码，另存到一个新文件中，档名改为CnZipInputStream.java。
+2.开始修改原始码，将class名称改为CnZipInputStream
+3.建构式也必须更改为CnZipInputStream
+4.新增member，这个member记录编码方式
+private String encoding="UTF-8";
+5.再新增一个建构式如下(这个建构式可以让这个class在new的时候，设定档名的编码)
+public CZipInputStream(InputStream in,String encoding) {
+this(in);
+this.encoding=encoding;
+}
+
+6.找到ZipEntry e = createZipEntry(getUTF8String(b, 0, len));这一行，将它改成如下：
+ZipEntry e=null; 
+try 
+{ 
+if (this.encoding.toUpperCase().equals("UTF-8")) 
+e=createZipEntry(getUTF8String(b, 0, len)); 
+else 
+e=createZipEntry(new String(b,0,len,this.encoding)); 
+} 
+catch(Exception byteE) 
+{ 
+e=createZipEntry(getUTF8String(b, 0, len)); 
+} 
+
+
+
+以上两个档案储存後compile产生CZipOutputStream.class及CZipInputStream.class，使用winzip开启 [java_home]\jre\lib\rt.jar这个档案，将CnZipOutputStream.class及 CnZipInputStream.class加进去,以後当压缩及解压缩时有中文档名及路径的问题时，就可以指定编码方式来处理了。
+
+使用方法:
+CnZipOutputStream zos=new CnZipOutputStream(OutputStream os,String encoding);
+CnZipInputStream zins=new CnZipInputStream(InputStream ins,String encoding);
+
+对于前面文章中文件打包下载中遇到的中文文件问题,解决手法是:
+OutputStream os = response.getOutputStream();
+CnZipOutputStream zos = new CnZipOutputStream(os,"gbk"); //加上中文编码类型

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class name="com.jxva.demo.model.TblAuthor" table="tbl_author">
+    <id name="authorid" type="java.lang.Integer" column="authorid">
+      <generator class="assigned"/>
+    </id>
+    <property name="authorname" type="java.lang.String" column="authorname" not-null="false" length="32"/>
+  </class>
+  <class name="com.jxva.demo.model.TblBook" table="tbl_book">
+    <id name="bookid" type="java.lang.Integer" column="bookid">
+      <generator class="assigned"/>
+    </id>
+    <property name="bookname" type="java.lang.String" column="bookname" not-null="false" length="64"/>
+    <property name="amount" type="java.lang.Integer" column="amount" not-null="false" length="11"/>
+    <property name="authorid" type="java.lang.Integer" column="authorid" not-null="true" length="11"/>
+  </class>
+  <class name="com.jxva.demo.model.TblIncrement" table="tbl_increment">
+    <id name="pktb" type="java.lang.String" column="pktb">
+      <generator class="assigned"/>
+    </id>
+    <property name="pk" type="java.lang.Integer" column="pk" not-null="true" length="11"/>
+  </class>
+  <class name="com.jxva.demo.model.TblBookinfo" table="tbl_bookinfo">
+    <property name="authorid" type="java.lang.Integer" column="authorid" not-null="true" length="11"/>
+    <property name="authorname" type="java.lang.String" column="authorname" not-null="false" length="32"/>
+    <property name="bookid" type="java.lang.Integer" column="bookid" not-null="true" length="11"/>
+    <property name="bookname" type="java.lang.String" column="bookname" not-null="false" length="64"/>
+    <property name="amount" type="java.lang.Integer" column="amount" not-null="false" length="11"/>
+  </class>
+</hibernate-mapping>

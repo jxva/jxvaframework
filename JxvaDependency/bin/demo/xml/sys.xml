@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva-framework>	
+	<sysconfig encoding="UTF-8" debug="true">
+		<!--错误信息页面-->	
+		<error-page>/pub/error.htm</error-page>	
+		<!--重复提交时定向到的页面-->
+		<resubmit-page>/pub/resubmit.htm</resubmit-page>
+		
+		<!-- 
+		<user-class></user-class>
+		-->
+	</sysconfig>
+	
+	<!-- rbac系统配置 -->
+	<rbac available="false">
+		<!--用户权限不够时返回的页面-->
+		<no-right-page>/pub/noright.htm</no-right-page>
+		<resources>
+			<resource type="url" isable="false"/>
+			<resource type="action" isable="false"/>
+			<resource type="menu" isable="false"/>
+			<resource type="operation" isable="false"/>
+		</resources>
+	</rbac>
+	
+	<ssoserver available="false">
+		<!-- 单点登录服务器地址 -->
+		<server>http://passport.ztemt.com.cn/</server>
+		<!-- 认证类 -->
+		<authenticator></authenticator>
+		<!-- 登录主页 -->
+		<login-page>http://passport.ztemt.com.cn/login.jsp</login-page>
+		<!-- 默认主页 -->
+		<home-page>http://account.ztemt.com.cn/</home-page>
+		<!-- 超时时间，以分为单位 -->
+		<time-out>240</time-out>
+		<!-- 多长时间用户没有活动表示用户为“非活动用户”，以分为单位 -->
+		<active-time>30</active-time>
+	
+		<!-- 
+			单点登录客户端
+			1. 仅配置跨域客户端，非跨域客户端无需配置；
+			2. 支持各种B/S语言，不限于JAVA；
+			3. client:为你客户端需要监听的页面
+		-->
+		<clients>
+			<client>http://fun.ztemusic.com/everyone.jsp?method=accept</client>
+			<client>http://127.0.0.1/everyone.jsp?method=accept</client>
+		</clients>
+	</ssoserver>
+	
+	<!--导航配置文件-->
+	<mvc>
+		<!-- <module remark="RBAC核心">rbac.xml</module>-->
+		<module remark="mvc">mvc.xml</module>
+		<!-- dfsa -->
+		<module remark="mvc">mvcd.xml</module>
+	</mvc>
+	
+	<initializers>
+		<initializer init-handler="com.jxva.mvc.SysConfig"/>
+		<initializer init-handler="com.jxva.mvc.Navigate"/>
+		<!-- 
+		<initializer init-handler="com.jxva.mvc.AppConfig"/>
+		<initializer init-handler="com.jxva.rbac.RbacConfig"/>
+		<initializer init-handler="com.jxva.sso.SSOConfig"/>
+		<initializer init-handler="com.jxva.jms.JMSConfig"/>
+		<initializer init-handler="com.jxva.jms.Transfer"/>
+		-->
+	</initializers>
+</jxva-framework>

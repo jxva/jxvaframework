@@ -1,0 +1,103 @@
+1.压缩代码
+
+/*
+ * Created on 2005-11-30
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package com.redtroy.zip;
+
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.util.zip.GZIPOutputStream;
+
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class ObjectCompress {
+    public void objectCompress(Object [] objects,String stream) throws java.io.FileNotFoundException,java.io.IOException{
+        java.io.FileOutputStream fos=new java.io.FileOutputStream(stream);
+        GZIPOutputStream gos=new GZIPOutputStream(fos);
+        ObjectOutputStream oos=new ObjectOutputStream(gos);
+        for(int i=0;i<objects.length;i++){
+            oos.writeObject(objects[i]);
+        }
+        System.out.println("compressing OK");
+        oos.close();
+        gos.close();
+        fos.close();
+    }
+    public void objectUncompress(String stream) throws java.io.IOException,ClassNotFoundException{
+        FileInputStream fis=new FileInputStream(stream);
+        java.util.zip.GZIPInputStream gis=new java.util.zip.GZIPInputStream(fis);
+        java.io.ObjectInputStream ois=new java.io.ObjectInputStream(gis);
+        ObjectDemo od1=null;
+       
+        while((od1=(ObjectDemo)ois.readObject())!=null){
+            od1.toString();
+        }
+        System.out.println("uncompressing OK");
+        ois.close();
+        gis.close();
+        fis.close();
+    }
+    public static void main(String args[]){
+        ObjectCompress oc=new ObjectCompress();
+        ObjectDemo od1=new ObjectDemo("troy",24);
+        ObjectDemo od2=new ObjectDemo("stone",23);
+        ObjectDemo [] ods={od1,od2};
+        try{
+            oc.objectCompress(ods,"dd");
+            oc.objectUncompress("dd");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+       
+    }
+}
+
+2.对象示例
+
+/*
+ * Created on 2005-11-30
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package com.redtroy.zip;
+import java.io.Serializable;
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class ObjectDemo implements Serializable{
+    private String name;
+    private int age;
+    public ObjectDemo(String name,int age){
+        this.name=name;
+        this.age=age;
+    }
+    public void setName(String name){
+        this.name=name;
+    }
+    public void setAge(int age){
+        this.age=age;
+    }
+    public String getName(){
+        return this.name;
+    }
+    public int getAge(){
+        return this.age;
+    }
+    public String toString(){
+        System.out.println("Name is "+this.name+";age is "+this.age);
+        return null;
+    }
+   
+}

@@ -1,0 +1,90 @@
+一.基础知识
+    信息发送者用其私钥对所传报文中提取数字指纹,进行RSA运算.,以保证发信人无法抵赖曾经发送过该信息.同时也保证报文在签名后没有被修改.也就是所说的不可抵赖性和完整性.当信息接受人收到信息后,使用公钥对收到的数字签名进行验证.
+    在数字签名中的数字指纹是通过特定的HASH算法产生的.HASH算法的特性如下:
+    1.接受报文的长度没有限制;
+    2.对任意长度的报文产生固定长度的数字指纹输出;
+    3.从报文能方便的计算出数字指纹;
+    4.难以对一个数字指纹生成报文,而只能通过报文推算出数字指纹;
+    5.两个不同的报文难以产生相同的数字指纹;
+二.使用方法:
+1.使用KeyPairGenerator生成密钥对,并分别保存;
+2.使用生成的PrivateKey对关键信息进行签名,返回byte [];
+3.接受方使用PublicKey和关键信息进行验证;
+三.示例代码:
+
+/*
+ * Created on 2005-3-21
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package org.redtroy;
+import java.security.*;
+import java.io.*;
+/**
+ * @author redtroy
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class RSA {
+    private void generateKeyPairIntoFile() throws Exception{
+        KeyPairGenerator keygen=KeyPairGenerator.getInstance("DSA");//这里的参数可以是RSA,DSA
+        SecureRandom secrand=new SecureRandom();
+        secrand.setSeed("redtroy".getBytes());
+        keygen.initialize(512,secrand);//这里的长度为512~1024之间,且为64的倍数
+        KeyPair keys=keygen.generateKeyPair();
+        PublicKey pubkey=keys.getPublic();
+        PrivateKey prikey=keys.getPrivate();
+        java.io.ObjectOutputStream out=new java.io.ObjectOutputStream(new java.io.FileOutputStream("/home/redtroy/private.key"));
+        out.writeObject(prikey);
+        out.close();
+        out=new java.io.ObjectOutputStream(new java.io.FileOutputStream("/home/redtroy/public.key"));
+        out.writeObject(pubkey);
+        out.close();
+    }
+    private PublicKey readPubKeyFromFile(String filepath) throws Exception{
+        java.io.ObjectInputStream in=new java.io.ObjectInputStream(new java.io.FileInputStream("mypubkey.dat"));
+        PublicKey pubkey=(PublicKey)in.readObject();
+        in.close();
+        return pubkey;
+    }
+    private PrivateKey readPriKeyFromFile(String filepath) throws Exception{
+        java.io.ObjectInputStream in=new java.io.ObjectInputStream(new java.io.FileInputStream("/home/redtroy/public.key"));
+        PrivateKey prikey=(PrivateKey)in.readObject();
+        in.close();
+        return prikey;
+    }
+    private byte [] signDataByPriKey(String src,String prikeyfilepath) throws Exception{
+        Signature sign=Signature.getInstance("DSA");
+        PrivateKey prikey=this.readPriKeyFromFile(prikeyfilepath);
+        sign.initSign(prikey);
+        sign.update(src.getBytes());
+        byte [] signedinfo=sign.sign();
+        return signedinfo;
+    }
+    private boolean checkSignedInfo(String signedstring,String pubkeyfilepath) throws Exception{
+          java.security.Signature signetcheck=java.security.Signature.getInstance("DSA");
+          PublicKey pubkey=this.readPubKeyFromFile(pubkeyfilepath);
+          signetcheck.initVerify(pubkey);
+          signetcheck.update(signedstring.getBytes());
+          if (signetcheck.verify(signedstring.getBytes())){
+              return true;
+          }else{
+              return false;
+          }
+    }
+    public static void main(String args[]){
+        RSA rsa=new RSA();
+        String string="23";
+        String filepath="/home/redtroy/private.key";
+        try{
+        rsa.generateKeyPairIntoFile();
+        String out=new String(rsa.signDataByPriKey(string,filepath));
+        System.out.print(out);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+   
+}

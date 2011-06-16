@@ -1,0 +1,123 @@
+ response.getOutputStream() 在jsp页面 中抛出异常的的处理
+ 
+添加如下代码：
+out.clear();
+out = pageContext.pushBody(); 
+
+
+
+
+
+
+<HTML>
+  <HEAD>
+    <TITLE>Using jspInit and jspDestroy</TITLE>
+  </HEAD>
+
+  <BODY>
+    <H1>Using jspInit and jspDestroy</H1>
+    <%!
+    int number;
+
+    public void jspInit()
+    {
+      number = 5;
+    }
+
+    public void jspDestroy()
+    {
+      number = 0;
+    }
+    %>
+
+    <%
+    out.println("The number is " + number + "<BR>");
+    %>
+  </BODY>
+</HTML>
+
+
+
+
+
+
+
+
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Properties;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class AreaCode extends HttpServlet {
+  private Object[][] data = new Object[][] { { "Yukon Territory", new int[] { 867 } }, };
+  Properties lookup = new Properties();
+
+  public void init() {
+    for (int i = 0; i < data.length; i++) {
+      Object[] record = data[i];
+      String state = (String) record[0];
+      int[] codes = (int[]) record[1];
+      for (int j = 0; j < codes.length; j++) {
+        lookup.put(String.valueOf(codes[j]), state);
+      }
+    }
+  }
+
+  public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
+      IOException {
+    res.setContentType("text/vnd.wap.wml");
+    PrintWriter out = res.getWriter();
+
+    String msg = null;
+
+    String code = req.getParameter("code");
+    String region = null;
+    if (code != null) {
+      region = lookup.getProperty(code);
+    }
+
+    out.println("<?xml version=\"1.0\"?>");
+    out.println("<!DOCTYPE wml PUBLIC " + "\"-//WAPFORUM//DTD WML 1.1//EN\" "
+        + "\"http://www.wapforum.org/DTD/wml_1.1.xml\">");
+
+    out.println("<wml>");
+    out.println("<card id=\"Code\" title=\"Code\">");
+    out.println("  <p>");
+    out.println("  Area code '" + code + "'<br/>");
+    if (region != null) {
+      out.println("  is " + region + ".<br/>");
+    } else {
+      out.println("  is not valid.<br/>");
+    }
+    out.println("  </p>");
+    out.println("</card>");
+    out.println("</wml>");
+  }
+
+
+}
+
+/*
+<?xml version="1.0"?>
+
+<!DOCTYPE wml PUBLIC
+  "-//WAPFORUM//DTD WML 1.1//EN"
+  "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+<wml>
+  <card id="AreaCode" title="Enter an Area Code">
+    <do type="accept" label="Enter">
+      <go href="servlet/AreaCode?code=$(code)"/>
+    </do>
+    <p>
+    Enter an Area Code: <input type="text" name="code"/>
+    </p>
+  </card>
+</wml>
+
+*/

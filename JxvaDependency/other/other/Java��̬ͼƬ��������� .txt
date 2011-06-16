@@ -1,0 +1,111 @@
+使用Java动态处理图片非常方便，可以用于很多应用场合，比如动态输入股市线，缩略图，动态banner图片、动态的界面风格等等。笔者也在软件开发过程中使用了这些技术，使得软件的界面色彩风格可以用户自定义任何一种色彩，大大增强了软件界面的个性化适应能力。下面我对使用Java技术实现图片处理的整个环节做主要说明：
+
+
+1、图片的装载。我们要处理图片首先要装载图片到Java内存空间的图片对象，Java用很多类来支持图片的装载，比如
+         a、根据图片文件字节数组装载图片:
+ public  Image  loadImage(byte[]  data){
+   Image  t=Toolkit.getDefaultToolkit().createImage(data);
+   trackImage(t,"装载字节数组图片");
+   return  t;
+ }
+         b、根据URL来装载图片:
+ public  Image  loadImage(String  urlpath){
+   Image  t=null;
+   if(a  instanceof  Applet){
+     try{
+       URL  u=getResourceURL(urlpath);
+       t=getApplet().getImage(u);
+       trackImage(t,urlpath);//检测图片装载过程
+     }catch(Exception  e){
+       notifyListener(MediaLoadEvent.MEDIA_LOAD_FAILED,false,e.getMessage());//装载失败
+     }
+   }else{
+     t=Toolkit.getDefaultToolkit().getImage(urlpath);
+     trackImage(t,urlpath);//检测图片装载过程
+   }
+   return  t;
+ }
+ public  Image  loadImage(String  urlpath,boolean  isurl){
+   Image  t=null;
+   if(isurl){
+     try{
+       URL  u=getResourceURL(urlpath);
+       t=Toolkit.getDefaultToolkit().getImage(u);
+       trackImage(t,urlpath);
+     }catch(Exception  e){
+       notifyListener(MediaLoadEvent.MEDIA_LOAD_FAILED,false,e.getMessage());//装载失败
+     }      
+   }else{
+     t=Toolkit.getDefaultToolkit().getImage(urlpath);
+     trackImage(t,urlpath);//检测图片装载过程
+   }
+   return  t;
+ }
+2、图片装载完成后，我们可以对图片进行处理，改变色度、亮度、对比度，翻转、镜像等等处理操作。在这里我只详细讲一下最底层的象素变换调整技术，其他很多方法大都是根据这个来封装的。
+ a、根据制定颜色值和一定范围色差讲图片做透明处理：
+ public  Image  transpanent(Image  repImage,Color  oldColor,int  errorRange){
+   int  w=repImage.getWidth(a);
+   int  h=repImage.getHeight(a);
+   int[]  imgdata=parImage(repImage,w,h);
+   int  rr,gg,bb;
+   rr=oldColor.getRed();
+   gg=oldColor.getGreen();
+   bb=oldColor.getBlue();
+   int  offr,offg,offb;
+   for(int  i=0;i<h;i++){//逐行扫描
+     for(int  j=0;j<w;j++){//逐列扫描
+       int  which=i*w+j;
+       int  r=((imgdata[which]&0xff0000>>>16));
+       int  g=((imgdata[which]&0xff00>>>8));
+       int  b=(imgdata[which]&0xff);
+       offr=Math.abs(r-rr);
+       offg=Math.abs(g-gg);
+       offb=Math.abs(b-bb);
+       if(offr+offg+offb<errorRange)imgdata[i*w+j]=16777215;
+     }
+   }
+   Image  t=Toolkit.getDefaultToolkit().createImage(new  MemoryImageSource(w,h,imgdata,0,w));
+   trackImage(t,"装载透明处理图片");
+   return  t;
+ }
+ b、对图片做剪切处理，这里使用了图片处理过滤类CropImageFilter，类似的过滤器很多，分别实现不同要求的图片处理变换。
+ public  Image  crop(int  x,int  y,int  w,int  h  ,Image  img){
+   ImageFilter  filter=new  CropImageFilter(x,y,w,h);
+   ImageProducer  producer=new  FilteredImageSource(img.getSource(),filter);
+   Image  t=a.createImage(producer);
+   trackImage(t,"装载剪切图片");
+   return  t;
+ }
+3、图片复合和绘制图片：
+ 使用Java的绘图类，可对多个图片进行叠加，并可以自定义绘制各种图形图象，比如实现图片水印、验证码图片，叠加banner图片等。
+
+  public  static  void  createImagePNG(String  signcode,OutputStream  out){
+   BufferedImage  offimg=null;
+   Graphics  offgra=null;
+   while(offimg==null||offgra==null){
+     if(offimg==null)offimg=new  BufferedImage(50,18,BufferedImage.TYPE_INT_RGB);
+     if(offgra==null&&offimg!=null)offgra=offimg.getGraphics();
+   }
+   offgra.setColor(new  Color(235,235,235));
+   offgra.fillRect(0,0,50,18);
+   /*for(int  i=0;i<12;i++){//生成混淆背景，也可用混淆背景图片
+     offgra.setColor(Color.decode("#"+color[SystemTool.getRandom(0,color.length-1)]));
+     offgra.fillOval(SystemTool.getRandom(0,48),SystemTool.getRandom(0,18),1,1);//10,4);
+   }*/
+   offgra.setColor(Color.red);
+   //offgra.setColor(Color.decode("#"+color[SystemTool.getRandom(0,color.length-1)]));
+   try{
+     Font  font  =  Font.createFont(Font.TRUETYPE_FONT,com.sunstudio.util.ClassLoaderEx.getResourceInputStream(SystemConfig.getParameter("validate_font")));//  FileInputStream("c:\\\\comicbd.ttf"));
+     offgra.setFont(font.deriveFont(Font.BOLD,18F));
+   }catch(Exception  e){}
+   offgra.drawString(signcode,1,14);
+   PngEncoder  png=new  PngEncoder(Toolkit.getDefaultToolkit().createImage(offimg.getSource()),PngEncoder.ENCODE_ALPHA,PngEncoder.FILTER_LAST,3);
+   try{out.write(png.pngEncode());}catch(Exception  e){}
+   offgra.dispose();
+ }
+
+4。图片的编码输出：
+           Java的图片对象是用于图片装载和处理的数据统一对象，当需要输出到输出设备时需要以指定图片文件格式来编码保存，常见的图片编码器有jpg、 bmp、gif89、gif87、png等等。笔者收集了很多图片格式编码器，如有需要可以和我联系，linlichao@163.com。
+           对于输出哪种格式的图片只是编码器不同，过程完全相同，编码器就是按照不同的文件格式的要求对图片对象进行编码输出，这些都是国际标准，我们只需要调用就好了。
+ PngEncoder  png=new  PngEncoder(Toolkit.getDefaultToolkit().createImage(offimg.getSource()),PngEncoder.ENCODE_ALPHA,PngEncoder.FILTER_LAST,3);
+ try{out.write(png.pngEncode());}catch(Exception  e){}

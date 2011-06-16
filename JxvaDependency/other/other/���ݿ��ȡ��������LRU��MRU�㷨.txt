@@ -1,0 +1,41 @@
+数据库存取缓冲区的LRU与MRU算法
+
+ 
+
+1.Cache Hit and Cache Miss
+
+当使用者第一次向数据库发出查询数据的请求的时候，数据库会先在缓冲区中查找该数据,如果要访问的数据恰好已经在缓冲区中(我们称之为Cache Hit)那么就直接用缓冲区中读取该数据.
+
+反之如果缓冲区中没有使用者要查询的数据那么这种情况称之为Cache Miss,在这种情况下数据库就会先从磁盘上读取使用者要的数据放入缓冲区,使用者再从缓冲区读取该数据.
+
+很显然从感觉上来说Cache Hit会比Cache Miss时存取速度快.
+
+ 
+
+2. LRU(最近最少使用算法) and MRU(最近最常使用算法)
+
+所谓的LRU(Least recently used)算法的基本概念是:当内存的剩余的可用空间不够时,缓冲区尽可能的先保留使用者最常使用的数据,换句话说就是优先清除”较不常使用的数据”,并释放其空间.之所以”较不常使用的数据”要用引号是因为这里判断所谓的较不常使用的标准是人为的、不严格的.所谓的MRU(Most recently used)算法的意义正好和LRU算法相反.
+
+下面我们通过Oracle 9i Cache中对LRU和MRU的使用来看一下两者在缓冲区工作机制中的作用和区别:
+
+     在Oracle 9i中有LRU List的概念: 我们可以把LRU List想象成是一连串的缓冲区集合,两端分别是LRU端和MRU端, 当数据库从磁盘上读取数据放入缓冲区时,系统必须先确定缓冲区中有free buffers,这个时候Oracle 9i会扫描LRU List,扫描的基本原则是:
+
+1.     从LRU端到MRU端;
+
+2.     当扫描到free buffer或已扫描的缓冲区数目超过临界值时,就会停止扫描动作;
+
+      如果在扫描过程顺利的在LRU List中找到了free buffer,那么Oracle 9i就把从磁盘读出的数据写到free buffer中然后把free buffer加到LRU List的MRU端.
+
+      那如果扫描过程没有在LRU List中找到free buffer怎么办?当然是从LRU List的LRU端开始清除缓冲区,如此一来就可以腾出新的空间了.
+
+      下图就是一个例子:
+
+          使用者查询数据A,初始的时候LRU List中没有数据A,于是Oracle 9i到磁盘读取A,然后放到LRU List的MRU端,使用者再从LRU List中读取数据A,同理对于B,C…当LRU List满了以后,如果使用者查询N,此时N不在LRU List中而且LRU List中已经没有free buffer了,此时Oracle 9i就开始从LRU端淘汰A以腾出空间存放N.
+
+                      图 1
+
+ 
+
+我们再来看另外一种情况:
+
+    在State 3之后,恰好使用者持续的查询A—这将会导致A一直被放置在靠近MRU端的缓冲区,结果将如图State m’所示,你会发现图2的State m’与图1的State m缓冲区存放的数据完全一样但是存放位置不一样.此时LRU List满了,如果再放N的时候LRU List`淘汰的是B,因为A的查询率高于B,所以LRU List让A在缓冲区中呆上较长的时间而先淘汰掉”较不常用的”的B.

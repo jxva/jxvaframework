@@ -1,0 +1,65 @@
+java-日志服务使用多线程(2009-01-24 17:36:23)
+标签：it 	分类：并行计算与分布计算
+1、写入日志的活动作为生产者，读取日志的活动做为消费者。
+2、保证创建新日志消息的各个子任务是原子的。但不希望在消息加入队列时加锁，即将put方法和take方法放在同步之外。
+public class LogService{
+   private final BlockingQueue<String> queue;
+   private final LoggerThread loggerThread;
+   private final PrintWriter writer;
+   @GuardBy("this") private boolean isShutdown;
+   @GuardBy("this") private int reservations;  
+  
+   public vid start(){loggerThread.start();}
+   public viod stop(){
+       syndhronized (this) (isShutdown=true;)
+       loggerThread.interrupt();
+   }
+  
+   public void log(String msg) throws InterruptedException{
+       synchronized (this){
+           if (isShutdown) throws new IllegalStateException(...);++revations;
+       }
+       queue.put(msg);
+   }
+  
+   private class loggerThread extends Thread{
+         public void run(){
+              try{
+                    while (true){
+                       try{
+                             synchronized (LogService.this){
+                                  if (isShutdown&&reservations==0) break;
+                             }
+                       }
+                    }catch (InterruptedException e){}
+              }
+         }
+         finally{
+                  writer.close();
+         }
+   }
+  
+ 
+}
+3、封装ExecutorService通过增加链接，把所有权链从应用程序扩展到了服务，再到线程；每个链上的成员管理它的拥有的服务或线程的生命周期
+public class Logservice{
+    private final ExecutorService exec=newSingleThreadExecutor();
+    ...
+    public void start(){}
+   
+    public void stop() throws InterruptedException{
+        try{
+          exec.shutdown();
+          exec.awaitTermination(TIMEOUT,UNIT);
+        }
+        finally{
+             writer.close();
+        }
+    }
+    public void log(String msg){
+             try{
+              }
+              catch (RejectedExecutionException ignored) {}
+    }
+}
+4、 一个可识别的对象，置于队列中，意味着当你得到它时，停止一切工作。

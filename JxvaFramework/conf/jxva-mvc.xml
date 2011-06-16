@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>
+
+	<package namespace="default">
+		<action name="reload" class="com.jxva.mvc.Reload"/>
+	</package>
+	
+</jxva>
+

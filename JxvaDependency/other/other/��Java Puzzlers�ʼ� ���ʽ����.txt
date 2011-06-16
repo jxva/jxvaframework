@@ -1,0 +1,127 @@
+一.奇数性
+         判断一个数是否为奇数,方法:         
+
+   1.  public static boolean isOdd(int i){
+   2.         return (i%2)!=0;
+   3.     }
+
+或者:
+
+   1.  public static boolean isOdd(int i){
+   2.         return (i&2)!=0;
+   3.     }
+
+       不要使用i%2==1来判断,因为它无法判断负奇数的情况.
+
+二.浮点数
+       浮点数计算一直是计算机中一个比较困难的问题，William (Velvel) Morton Kahan就因为他在数值分析领域基础性的贡献而获得了图灵奖，他也是IEEE754标准的主要设计者。关于这个标准，计算机组成原理或者系统结构的书上都有介绍。
+　　浮点数不是精确表示的，所以涉及到精确计算的情况(比如货币)，不要使用float,double，而要使用BigDecimal类（使用String构造）。
+        例子:       
+
+   1. System.out.println(2.00 - 1.10);
+
+可以使用下面代码代替:   
+     
+import java.math.BigDecimal;
+
+   1. System.out.println(new BigDecimal("2.00").subtract(new BigDecimal("1.10")));
+
+三.长整除
+       题目:     
+
+   1.         final long MICROS_PER_DAY = 24 * 60 * 60 * 1000 * 1000;
+   2.         final long MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
+   3.         System.out.println(MICROS_PER_DAY / MILLIS_PER_DAY);
+
+结果: 5
+
+      24*60*60*1000*1000,24,60这些字面常量都是int类型的,它们计算的结果也是int类型,但是int类型无法保存这么大的结果,因此计算过程中会产生溢出,从而带来不正确的结果.教训:当操作很大的数字时，千万要提防溢出．
+　把程序修改一下：　　
+
+   1.  　　final long MICROS_PER_DAY = 24L * 60 * 60 * 1000 * 1000;
+   2.         final long MILLIS_PER_DAY = 24L * 60 * 60 * 1000;
+   3.         System.out.println(MICROS_PER_DAY / MILLIS_PER_DAY);
+
+　　　还要注意使用Long类型的常量时用大写字母L表示，因为小写的l跟数字1看起来很像，给看代码和理解代码带来了困难．
+
+四．多重转换
+　　题目：　　
+
+   1. System.out.println((int)(char)(byte)-1);
+
+输出是：65535
+     
+       如果最初的数值类型是有符号的,那么就执行符号扩展;如果它是char,那么不管它将要被转换成什么类型,都执行零扩展.
+       如果对结果有特殊要求,使用掩码和位运算以达到自己的目标.
+
+五.互换内容
+      题目:     
+
+   1.         int x = 1984;
+   2.         int y = 2001;
+   3.         x ^= y ^= x ^= y;
+   4.         System.out.println("x=" + x + ";y=" + y);
+
+结果是: x=0;y=1984
+       Java语言规范中描述了:操作符的操作数都是从左向右求值的.为了求表达式x^=expr的值,在计算expr之前提取x的值,并且将这两个值的异或结果赋给变量x.在上面的题目中,变量x 的值被提取了两次,每次在表达式中出现时都提取一次,但是两次提取都发生在所有的赋值操作之前.
+      下面的代码详细地描述了将互换管用法分解之后的行为,并且解释了为什么产生的是看到的输出:
+　　
+
+   1. 　　int tmp1 = x;
+   2.         int tmp2 = y;
+   3.         int tmp3 = x ^ y;
+   4.         x = tmp3;
+   5.         y = tmp2 ^ tmp3;
+   6.         x = tmp1 ^ y;
+
+　　这个具体的转换过程考虑单独写文再分析一下．　　　
+　　教训：在单个的表达式中不要对相同的变量赋值两次．要避免所谓聪明的编程技巧．
+　　　
+
+六: ?:表达式
+　　题目：　　
+
+   1. 　　 char x = 'X';
+   2.         int i = 0;
+   3.         System.out.println(true ? x : 0);
+   4.         System.out.println(false ? i : x);
+
+输出：
+X
+88
+
+       混合类型的计算会引起混乱，而这一点在条件表达式中比其他任何地方都更明显．
+　　确定条件表达式结果类型的规则核心是以下三点：
+       (1)如果第二个和第三个操作数具有相同的类型,那么它就是条件表达式的类型.换句话说,可以通过绕过混合类型的计算来避免大麻烦.
+      (2)如果一个操作数的类型是T,T表示byte,short或char,而另一个操作数是一个int类型的常量表达式(字面常量或者final常量),它的值可以用类型T表示,那么条件表达式的类型就是T.
+      (3)否则,将对操作数类型进行二进制数字提升,而条件表达式的类型就是第二个和第三个操作数被提升之后的类型.
+      理解了这三点,本题的例子也就解决了.
+      条件表达式的类型将决定调用哪一个重载的print方法.
+      总之,通常最好是在条件表达式中使用类型相同的第二和第三操作数.
+
+七.复合赋值运算符Compound Assignment Operators
+        下面这个例子是最常见的了,论坛里也是隔三差五就有人拿出来问:　　　
+
+   1. 　　short s = 0;
+   2.         s += 1;   //ok
+   3.         s = s + 1; //error
+
+　　　先看java语言规范中的描述：
+　　　All compound assignment operators require both operands to be of primitive type, except for +=, which allows the right-hand operand to be of any type if the left-hand operand is of type String.
+
+A compound assignment expression of the form E1 op= E2 is equivalent to E1 = (T)((E1) op (E2)), where T is the type of E1, except that E1 is evaluated only once. Note that the implied cast to type T may be either an identity conversion  or a narrowing primitive conversion. For example, the following code is correct:
+
+
+short x = 3;
+x += 4.6;
+
+and results in x having the value 7 because it is equivalent to:
+
+
+short x = 3;
+x = (short)(x + 4.6);
+
+　　复合赋值表达式自动地将所执行计算的结果转型为其左侧变量的类型．
+　　java中，对byte,short和char类型的运算都是通过将它们提升为int类型进行的，所以计算的结果是int 类型，如果要
+把结果赋值给一个更窄的类型，需要自己加上强制类型转换．更深层次的原因可以去看jvm中提供的相关运算指令．
+　　从JLS上的介绍同时要注意到另一个问题，String类型重载了+=操作符，并支持任何类型的右操作数．

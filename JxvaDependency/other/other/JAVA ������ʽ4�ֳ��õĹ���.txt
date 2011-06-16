@@ -1,0 +1,87 @@
+正则表达式在字符串处理上有着强大的功能，sun在jdk1.4加入了对它的支持
+
+　　下面简单的说下它的4种常用功能：
+　　
+　　查询：
+　　
+以下是代码片段：
+String str="abc efg ABC";
+
+String regEx="a|f"; //表示a或f
+
+Pattern p=Pattern.compile(regEx);
+
+Matcher m=p.matcher(str);
+
+boolean rs=m.find();
+
+　　
+　　如果str中有regEx，那么rs为true，否则为flase。如果想在查找时忽略大小写，则可以写成Pattern p=Pattern.compile(regEx,Pattern.CASE_INSENSITIVE);
+　　
+　　提取：
+
+以下是代码片段：
+String regEx=".+\(.+)$";
+
+String str="c:\dir1\dir2\name.txt";
+
+Pattern p=Pattern.compile(regEx);
+
+Matcher m=p.matcher(str);
+
+boolean rs=m.find();
+
+for(int i=1;i<=m.groupCount();i++){
+
+System.out.println(m.group(i));
+
+}
+
+　　
+　　以上的执行结果为name.txt，提取的字符串储存在m.group(i)中，其中i最大值为m.groupCount();
+　　
+　　分割：
+　　
+以下是代码片段： 54com.cn
+String regEx="::";
+
+Pattern p=Pattern.compile(regEx);
+
+String[] r=p.split("xd::abc::cde");
+
+执行后，r就是{"xd","abc","cde"}，其实分割时还有跟简单的方法：
+
+String str="xd::abc::cde";
+
+String[] r=str.split("::");
+
+　　
+　　替换（删除）：
+　　
+以下是代码片段：
+String regEx="a+"; //表示一个或多个a
+
+Pattern p=Pattern.compile(regEx);
+
+Matcher m=p.matcher("aaabbced a ccdeaa");
+
+String s=m.replaceAll("A");
+　　
+　　结果为"Abbced A ccdeA"
+　　
+　　如果写成空串，既可达到删除的功能，比如：
+　　
+String s=m.replaceAll("");
+　　
+　　结果为"bbced ccde"
+　　
+　　附：
+　　
+　\D 等於 [^0-9] 非数字
+　\s 等於 [ \t\n\x0B\f ] 空白字元
+　\S 等於 [^ \t\n\x0B\f ] 非空白字元
+　\w 等於 [a-zA-Z_0-9] 数字或是英文字
+　　\W 等於 [^a-zA-Z_0-9] 非数字与英文字
+　　
+　　^ 表示每行的开头
+　　$ 表示每行的结尾

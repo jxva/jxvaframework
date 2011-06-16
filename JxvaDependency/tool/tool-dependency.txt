@@ -1,0 +1,10 @@
+baseline.jar
+db2jcc.jar
+db2jcc_license_cu.jar
+derbyclient.jar
+derbytools.jar
+mysql-connector-java-5.1.6-bin.jar
+oracle.jar
+sqljdbc.jar
+swt-3.4.1.jar
+swt-grouplayout.jar

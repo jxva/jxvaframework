@@ -1,0 +1,9 @@
+response.reset()和response.resetBuffer()
+
+getResponse的getWriter()方法连续两次输出流到页面的时候，第二次的流会包括第一次的流，所以可以使用将response.reset或者resetBuffer的方法。
+
+reset():
+Clears any data that exists in the buffer as well as the status code and headers. If the response has been committed, this method throws an IllegalStateException.
+
+resetBuffer():
+Clears the content of the underlying buffer in the response without clearing headers or status code. If the response has been committed, this method throws an IllegalStateException. 

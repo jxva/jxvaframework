@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxva>	
+	<sysconfig debug="true">
+		<error-page>/pub/error.htm</error-page>	
+		<resubmit-page>/pub/resubmit.htm</resubmit-page>
+	</sysconfig>
+	
+	<mvc use-dao="true">
+		<invoke-class>default</invoke-class>
+		<modules>
+			<module remark="jxva-demo">jxva-demo.xml</module>
+		</modules>
+	</mvc>
+	
+	<!-- 非必须配置,如果你不使用单点登录服务器,可以将此段删除 -->
+	<ssoserver>
+		<!-- 单点登录服务器地址 -->
+		<server>http://sso.jxva.com/</server>
+		<!-- 服务器验证类,必须实现com.jxva.sso.SSOInvoke接口 -->
+		<sso-invoke>com.jxva.sso.SSOImpl</sso-invoke>
+		<!-- 登录页面 -->
+		<login-page>/login.jsp</login-page>
+		<!-- 登录成功之后默认返回的页面 -->
+		<home-page>/index.jsp</home-page>
+		<!-- 超时时间，以分为单位 -->
+		<time-out></time-out>
+		<!-- 多长时间用户没有活动表示用户为“非活动用户”，以分为单位 -->
+		<active-time></active-time>
+		<!-- 
+			单点登录客户端
+			1. 仅配置跨域客户端，非跨域客户端无需配置；
+			2. 支持各种B/S语言，不限于JAVA；
+			3. client:为你客户端需要监听的页面
+		-->
+		<clients>
+			<client>http://www.jxva.org/</client>
+			<client>http://www.jxva.net/</client>
+		</clients>
+	</ssoserver>	
+		
+	<plugins>
+		<plugin class="com.jxva.plugin.SysPlugin"/>
+		<plugin class="com.jxva.plugin.MvcPlugin"/>
+	</plugins>
+</jxva>
