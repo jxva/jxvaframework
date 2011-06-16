@@ -1,0 +1,82 @@
+package com.jxva.dao;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import com.jxva.dao.connection.ConnectionProviderFactory;
+import com.jxva.dao.dialect.Dialect;
+import com.jxva.dao.entity.Environment;
+import com.jxva.dao.impl.DAOImpl;
+import com.jxva.dao.jdbc.ConnectionHolder;
+import com.jxva.log.Logger;
+
+
+public class DAOFactory{
+	
+	private static final ConcurrentMap<String,DAOFactory> daos=new ConcurrentHashMap<String,DAOFactory>();
+	private static final Logger log=Logger.getLogger(DAOFactory.class);
+	
+	private DAOImpl daoImpl;
+	private Environment env;
+	private JDBC jdbc;
+
+	private DAOFactory(){
+		
+	}
+	
+	private static class Singleton{
+		public static final DAOFactory getDAOFactory=new DAOFactory();
+	}
+	
+	public static DAOFactory getInstance(){
+		return getInstance("jxva");
+	}
+	
+	public static DAOFactory getInstance(String conf){
+		if(!daos.containsKey(conf)){
+			synchronized(DAOFactory.class){
+				if(daos.containsKey(conf)){
+					return daos.get(conf);
+				}
+				log.info("DAOFactory initializing...");	
+				DAOFactory factory=Singleton.getDAOFactory;
+				factory.env=new Environment(conf);
+				ConnectionHolder.init(ConnectionProviderFactory.getInstance(factory.env).getConnectionProvider());
+				factory.jdbc=Dialect.getJDBCImpl(factory.env.getDbtype());
+				factory.daoImpl=new DAOImpl();
+				daos.put(conf,factory);					
+			}
+		}
+		return daos.get(conf);
+	}
+	
+	public DAO createDAO(){
+		DAOImpl _daoImpl=null;
+		try {
+			_daoImpl=daoImpl.cloneDAOImpl();
+			_daoImpl.jdbc=jdbc.createJDBC(env);
+			_daoImpl.debug=env.getDebug();
+			//daoImpl.factory=this;
+		} catch (Exception e) {
+			if(_daoImpl!=null)_daoImpl.close();
+			throw new DAOException(e);
+		}
+		DAOProxy invocation=new DAOProxy();
+		return (DAO)invocation.bind(_daoImpl);
+	}
+	
+	public Environment getEnvironment() {
+		if(env==null){
+			log.warning("Environment hasn't been initialized.");
+		}
+		return env;
+	}
+	
+	public void destroy(){
+		try {
+			//cp.destroy();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

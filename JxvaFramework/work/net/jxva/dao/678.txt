@@ -1,0 +1,89 @@
+package com.jxva.dao;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import com.jxva.dao.connection.ConnectionProvider;
+import com.jxva.dao.connection.ConnectionProviderFactory;
+import com.jxva.dao.dialect.Dialect;
+import com.jxva.dao.entity.Environment;
+import com.jxva.dao.impl.DAOImpl;
+import com.jxva.dao.jdbc.ConnectionHolder;
+import com.jxva.log.Logger;
+
+
+public class DAOFactory{
+	
+	public static final ConcurrentMap<String,Factory> factorys=new ConcurrentHashMap<String,Factory>();
+	private static final Logger log=Logger.getLogger(DAOFactory.class);
+	
+	private volatile static String conf;
+
+	private DAOFactory(){
+		
+	}
+	
+	private static class Singleton{
+		public static final DAOFactory getDAOFactory=new DAOFactory();
+		public static final DAOImpl	  getDAOImpl=new DAOImpl();
+	}
+	
+	public static DAOFactory getInstance(){
+		return getInstance("jxva");
+	}
+	
+	
+	public static DAOFactory getInstance(String _conf){
+		if(!factorys.containsKey(_conf)){
+			synchronized(DAOFactory.class){
+				if(factorys.containsKey(_conf)){
+					return factorys.get(_conf).getDaoFactory();
+				}
+				log.info("DAOFactory initializing...");	
+				DAOFactory daoFactory=Singleton.getDAOFactory;
+				Environment env=new Environment(_conf);
+				JDBC jdbc=Dialect.getJDBCImpl(env.getDbtype());
+				Factory factory=new Factory();
+				factory.setDaoFactory(daoFactory);
+				factory.setEnvironment(env);
+				factory.setJdbc(jdbc);
+				ConnectionProvider cp=ConnectionProviderFactory.getInstance(env).getConnectionProvider();
+				factory.setConnectionProvider(cp);
+				factorys.put(_conf,factory);
+			}
+		}
+		conf=_conf;
+		ConnectionHolder.init(factorys.get(_conf).getConnectionProvider());
+		return factorys.get(_conf).getDaoFactory();
+	}
+	
+	public DAO createDAO(){
+		DAOImpl _daoImpl=null;
+		try {
+			_daoImpl=Singleton.getDAOImpl.cloneDAOImpl();
+			_daoImpl.jdbc=factorys.get(conf).getJdbc().createJDBC(factorys.get(conf).getEnvironment());
+			_daoImpl.debug=factorys.get(conf).getEnvironment().getDebug();
+			//daoImpl.factory=this;
+		} catch (Exception e) {
+			if(_daoImpl!=null)_daoImpl.close();
+			throw new DAOException(e);
+		}
+		DAOProxy invocation=new DAOProxy();
+		return (DAO)invocation.bind(_daoImpl);
+	}
+	
+	public Environment getEnvironment() {
+		if(factorys.get(conf).getEnvironment()==null){
+			log.warning("Environment hasn't been initialized.");
+		}
+		return factorys.get(conf).getEnvironment();
+	}
+	
+	public void destroy(){
+		try {
+			//cp.destroy();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

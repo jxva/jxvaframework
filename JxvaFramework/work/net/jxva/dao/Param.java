@@ -1,0 +1,39 @@
+/*
+ * Copyright @ 2006-2010 by The Jxva Framework Foundation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package net.jxva.dao;
+
+
+/**
+ *
+ * @author  The Jxva Framework Foundation
+ * @since   1.0
+ * @version 2009-01-06 09:32:45 by Jxva
+ */
+public class Param {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String srcWhere=" User.userId = 4 and Book.title = ' fsa d j3 ' or User.username like ' % f % ' ";
+		String destWhere="User.userId=? and Book.title=? or User.username like ?";
+		//String where=Pattern.compile(" {2,}").matcher(srcWhere).replaceAll(" ");
+		
+		
+		String where=srcWhere.replaceAll("\'([^\'']+)\'","? "); 
+		System.out.println(where);
+	}
+}
