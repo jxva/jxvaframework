@@ -11,6 +11,7 @@ drop table if exists tbl_press;
 drop table if exists tbl_press_type;
 drop table if exists tbl_category;
 drop table if exists tbl_tag;
+
 create table tbl_increment(
 	table_name	        varchar(64) not null,
 	increment_value		integer not null default 0,	
@@ -30,7 +31,9 @@ insert into tbl_author values (4,'lily');
 insert into tbl_author values (5,'lucy');
 insert into tbl_author values (6,'bluce');
 
+
 -- create unique tbl_author_unique on tbl_author(author_name);
+
 
 create table tbl_category(
 	category_id		integer NOT NULL default 0,
