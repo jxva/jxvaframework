@@ -11,7 +11,6 @@ drop table if exists tbl_press;
 drop table if exists tbl_press_type;
 drop table if exists tbl_category;
 drop table if exists tbl_tag;
-
 create table tbl_increment(
 	table_name	        varchar(64) not null,
 	increment_value		integer not null default 0,	
