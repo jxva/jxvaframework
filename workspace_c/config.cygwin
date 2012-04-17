@@ -1,0 +1,9 @@
+CC=gcc
+
+MYSQL_INCLUDE=E:/codeblocks/mysql-connector-c/include
+
+MYSQL_LIB=E:/codeblocks/mysql-connector-c/lib
+
+INSTALL_PATH=../jv/bin
+
+OBJS=objs

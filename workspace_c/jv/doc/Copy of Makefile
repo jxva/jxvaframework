@@ -1,0 +1,38 @@
+include ../config
+
+CFLAGS=-Wall -g -pedantic
+
+INCLUDES=-I.
+
+LIBS=
+
+LINKS=
+
+TARGET=main
+
+INSTALL_PATH=C:/
+
+C_OBJS=$(patsubst %.c, %.o,$(wildcard *.c))
+
+.c.o:
+	$(CC) -c -o $(addprefix $(OBJS)/,$*.o) $(CFLAGS) $(INCLUDES) $*.c
+	
+compile:$(C_OBJS)
+	test -d $(OBJS) || mkdir $(OBJS)
+#	mv *.o $(OBJS)
+	$(CC) $(LINKS) -o $(TARGET) $(addprefix $(OBJS)/,$^) $(LIBS)
+
+	@echo 
+	@echo success compiled.
+	@echo
+	
+install: $(TARGET)
+	cp $(TARGET) $(INSTALL_PATH)
+
+uninstall:
+	rm -f $(INSTALL_PATH)/$(TARGET)
+
+rebuild: clean compile
+
+clean:
+	rm -rf main $(OBJS) *~

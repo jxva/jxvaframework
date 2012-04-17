@@ -1,0 +1,37 @@
+1、wildcard : 扩展通配符
+2、notdir ： 去除路径
+3、patsubst ：替换通配符
+例子：
+建立一个测试目录，在测试目录下建立一个名为sub的子目录
+$ mkdir test
+$ cd test
+$ mkdir sub
+在test下，建立a.c和b.c2个文件，在sub目录下，建立sa.c和sb.c2 个文件
+建立一个简单的makefile
+src=$(wildcard *.c ./sub/*.c)
+dir=$(notdir $(src))
+obj=$(patsubst %.c，%.o，$(dir) ) 
+all:
+@echo $(src)
+@echo $(dir)
+@echo $(obj)
+@echo "end"
+
+执行结果分析：
+第一行输出：
+a.c b.c ./sub/sa.c ./sub/sb.c
+wildcard把 指定目录 ./ 和 ./sub/ 下的所有后缀是c的文件全部展开。
+第二行输出：
+a.c b.c sa.c sb.c
+notdir把展开的文件去除掉路径信息
+第三行输出：
+a.o b.o sa.o sb.o
+在$(patsubst %.c，%.o，$(dir) )中，patsubst把$(dir)中的变量符合后缀是.c的全部替换成.o，
+任何输出。
+或者可以使用
+obj=$(dir:%.c=%.o)
+效果也是一样的。
+这里用到makefile里的替换引用规则，即用您指定的变量替换另一个变量。
+它的标准格式是
+$(var:a=b) 或 ${var:a=b}
+它的含义是把变量var中的每一个值结尾用b替换掉a 

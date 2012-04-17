@@ -1,0 +1,43 @@
+include ../config
+
+CFLAGS=-Wall -g -pedantic
+
+INCLUDES=-I.
+
+LIBS=
+
+LINKS=
+
+TARGET=main
+
+INSTALL_PATH=C:/
+
+src=$(wildcard jv_*.c ./sub/*.c)
+C_OBJS=$(patsubst %.c, %.o,$(src))
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(addprefix $(OBJS)/,$*.o) -c $*.c
+	
+compile:$(C_OBJS)
+	test -d $(OBJS) || mkdir $(OBJS)
+#	mv *.o $(OBJS)
+#	$(CC) $(CFLAGS) $(INCLUDES) -c jv_pool.c -o $(OBJS)/jv_pool.o
+#	$(CC) $(CFLAGS) $(INCLUDES) -c jv_pool_test.c -o $(OBJS)/jv_pool_test.o
+	
+	$(CC) $(CFLAGS) $(INCLUDES) -c main.c -o $(OBJS)/main.o
+	$(CC) $(LINKS) -o $(TARGET) $(OBJS)/main.o $(addprefix $(OBJS)/,$^) $(LIBS)
+
+	@echo 
+	@echo success compiled.
+	@echo
+	
+install: $(TARGET)
+	cp $(TARGET) $(INSTALL_PATH)
+
+uninstall:
+	rm -f $(INSTALL_PATH)/$(TARGET)
+
+rebuild: clean compile
+
+clean:
+	rm -rf main $(OBJS) *~
